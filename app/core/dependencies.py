@@ -44,16 +44,16 @@ def get_current_user(
             detail="Invalid or expired token",
             headers={"WWW-Authenticate": "Bearer"},
         )
-    sub = payload.get("sub")
+    uid = payload.get("user_id")
     company_id = payload.get("company_id")
-    if sub is None or company_id is None:
+    if uid is None or company_id is None:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Invalid token payload",
             headers={"WWW-Authenticate": "Bearer"},
         )
     try:
-        user_id = int(sub)
+        user_id = int(uid)
         cid = int(company_id)
     except (TypeError, ValueError):
         raise HTTPException(
@@ -75,21 +75,6 @@ def get_current_user(
             detail="Invalid token payload",
             headers={"WWW-Authenticate": "Bearer"},
         )
-    uid_claim = payload.get("user_id")
-    if uid_claim is not None:
-        try:
-            if int(uid_claim) != user.id:
-                raise HTTPException(
-                    status_code=status.HTTP_401_UNAUTHORIZED,
-                    detail="Invalid token payload",
-                    headers={"WWW-Authenticate": "Bearer"},
-                )
-        except (TypeError, ValueError):
-            raise HTTPException(
-                status_code=status.HTTP_401_UNAUTHORIZED,
-                detail="Invalid token payload",
-                headers={"WWW-Authenticate": "Bearer"},
-            ) from None
     return user
 
 

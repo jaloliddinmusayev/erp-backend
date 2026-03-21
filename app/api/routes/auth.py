@@ -22,13 +22,7 @@ def login(payload: LoginRequest, db: Session = Depends(get_db)) -> TokenResponse
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Incorrect email or password",
         )
-    token = create_access_token(
-        user.id,
-        extra_claims={
-            "company_id": user.company_id,
-            "user_id": user.id,
-        },
-    )
+    token = create_access_token(user_id=user.id, company_id=user.company_id)
     return TokenResponse(access_token=token)
 
 

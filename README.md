@@ -3,7 +3,7 @@
 Phase 1 foundation for a **multi-tenant ERP** API: shared PostgreSQL today, schema and services structured so **dedicated database per company** and **JWT-scoped tenant context** can be added without rewriting the domain layer.
 
 - **Not in scope yet:** WMS integration (will be HTTP/API clients later), Docker.
-- **In scope:** Companies (`tenant_mode`: `shared` | `dedicated`), roles, users, branches, warehouses — all tenant-owned rows carry `company_id`.
+- **In scope:** Companies (`tenant_mode`: `shared` | `dedicated`), roles, users, branches, warehouses, **product master** (`categories`, `units`, `products`) — tenant via JWT `company_id`.
 
 ## Stack
 
@@ -36,29 +36,37 @@ Create the database (e.g. `erp_db`), then:
 # Optional: auto-generate future revisions after model changes (requires DB URL):
 # alembic revision --autogenerate -m "describe change"
 
-# Apply schema (includes initial revision 0001):
+# Apply schema (revisions 0001 + 0002 product master):
 alembic upgrade head
 ```
 
+New installs after pulling product master: ensure `alembic upgrade head` (or rely on app startup migrations on Render).
+
 ### Initial seed (first admin)
 
-From repo root (after migrations, `.env` with `DATABASE_URL`):
+Set in `.env` (see `.env.example`):
+
+- `ADMIN_EMAIL`
+- `ADMIN_PASSWORD`
+- optional `ADMIN_FULL_NAME`
+
+From repo root (DB reachable; migrations applied on app start or via `alembic upgrade head`):
 
 ```bash
 python scripts/seed.py
 ```
 
-Creates company **`core`** (Core ERP Demo), role **`admin`**, user **`admin@erp.uz`** / password **`123456`** if missing. Safe to run multiple times.
+Creates company **`core`**, role **`admin`**, and the admin user if missing. Idempotent.
 
 ### Auth flow (example)
 
-1. `POST /auth/login` with `{"email":"admin@erp.uz","password":"123456"}` → `access_token`  
+1. `POST /auth/login` with the same email/password as in `ADMIN_*` → `access_token`  
 2. `GET /auth/me` with header `Authorization: Bearer <token>` → user + role  
 3. Use the same header for other protected routes.
 
 **Admin-only:** `POST /companies`, `POST /users`, `POST /roles` require role code `admin`.
 
-The repository ships with revision **`0001_initial_schema`**. Use `alembic revision --autogenerate` for **subsequent** changes once models evolve.
+Shipped revisions: **`0001_initial_schema`**, **`0002_product_master`** (categories, units, products). Further changes: `alembic revision --autogenerate`.
 
 ### Run the API
 
@@ -74,19 +82,25 @@ chmod +x start.sh
 ```
 
 - **OpenAPI:** [http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs)  
-- **Root health:** `GET /` → `{"message": "Core ERP API is running"}`
+- **Root:** `GET /` → `{"message": "Core ERP API is running"}`  
+- **Health (load balancers):** `GET /health` → `{"status": "ok"}`  
+
+On startup the app logs DB connectivity and runs `alembic upgrade head` when `RUN_MIGRATIONS_ON_STARTUP=true` (default).
 
 ## API overview (phase 1)
 
 | Prefix        | Actions |
 |---------------|---------|
 | `/companies`  | `POST /`, `GET /` |
-| `/roles`      | `POST /`, `GET /?company_id=` |
-| `/users`      | `POST /`, `GET /?company_id=` |
-| `/branches`   | `POST /`, `GET /?company_id=` |
-| `/warehouses` | `POST /`, `GET /?company_id=` |
+| `/roles`      | `POST /`, `GET /` (JWT tenant) |
+| `/users`      | `POST /`, `GET /` (JWT tenant) |
+| `/branches`   | `POST /`, `GET /` (JWT tenant) |
+| `/warehouses` | `POST /`, `GET /` (JWT tenant) |
+| `/categories` | CRUD + `PATCH .../deactivate` (JWT tenant) |
+| `/units`       | CRUD + `PATCH .../deactivate` (JWT tenant) |
+| `/products`    | CRUD + `PATCH .../deactivate`; optional `GET ?category_id=` filter |
 
-List endpoints take **`company_id` as a query parameter** until JWT + `current_user` supply tenant context.
+Tenant scope comes from **`Authorization: Bearer`** (`company_id` in JWT). **Do not** send `company_id` in bodies for these resources.
 
 ## Layout
 

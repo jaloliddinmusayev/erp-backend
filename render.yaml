@@ -22,3 +22,5 @@ services:
         value: "30"
       - key: JWT_ALGORITHM
         value: HS256
+      - key: RUN_MIGRATIONS_ON_STARTUP
+        value: "true"

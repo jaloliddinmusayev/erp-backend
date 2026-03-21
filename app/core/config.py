@@ -24,6 +24,14 @@ class Settings(BaseSettings):
     access_token_expire_minutes: int = 30
     jwt_algorithm: str = "HS256"
 
+    # Bootstrap seed (`scripts/seed.py`) — never commit real passwords to git
+    admin_email: str = ""
+    admin_password: str = ""
+    admin_full_name: str = "Super Admin"
+
+    # Set false if migrations run in CI/release phase only (multi-worker setups)
+    run_migrations_on_startup: bool = True
+
 
 @lru_cache
 def get_settings() -> Settings:

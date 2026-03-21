@@ -1,10 +1,7 @@
 """
 Password hashing (bcrypt) and JWT issue/verify.
 
-Access tokens carry:
-  - `sub` / `user_id`: user primary key
-  - `company_id`: tenant
-Expiration: `Settings.access_token_expire_minutes`.
+JWT claims: `user_id`, `company_id`, `exp` only (no `sub`).
 """
 
 from datetime import UTC, datetime, timedelta
@@ -27,12 +24,11 @@ def verify_password(plain_password: str, password_hash: str) -> bool:
 
 
 def create_access_token(
-    subject: str | int,
     *,
-    extra_claims: dict[str, Any] | None = None,
+    user_id: int,
+    company_id: int,
     expires_delta: timedelta | None = None,
 ) -> str:
-    """Build a signed JWT (use after login flow exists)."""
     settings = get_settings()
     expire = datetime.now(UTC) + (
         expires_delta
@@ -40,11 +36,10 @@ def create_access_token(
         else timedelta(minutes=settings.access_token_expire_minutes)
     )
     to_encode: dict[str, Any] = {
-        "sub": str(subject),
+        "user_id": user_id,
+        "company_id": company_id,
         "exp": int(expire.timestamp()),
     }
-    if extra_claims:
-        to_encode.update(extra_claims)
     return jwt.encode(to_encode, settings.secret_key, algorithm=settings.jwt_algorithm)
 
 

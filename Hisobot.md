@@ -49,9 +49,22 @@ Bu fayl loyihada bajarilgan asosiy ishlarni va qararlarni yozib borish uchun. **
 
 ---
 
+## 2026-03-21 — Production startup va JWT
+
+- **Lifespan:** DB `SELECT 1`, logging, `alembic upgrade head` (`RUN_MIGRATIONS_ON_STARTUP`, Render uchun).
+- **GET `/health`** — `{"status":"ok"}`.
+- **JWT:** faqat `user_id`, `company_id`, `exp` (`sub` yo‘q).
+- **Seed:** `ADMIN_EMAIL`, `ADMIN_PASSWORD` (`.env`); hardcode parol olib tashlandi.
+
+## 2026-03-21 — Mahsulot master ma’lumotlari
+
+- Modellar: `Category`, `Unit`, `Product` (`company_id`, kodlar kompaniya bo‘yicha noyob, barcode qisman noyob indeks).
+- Servislar va route’lar: `/categories`, `/units`, `/products` — faqat JWT; `deactivate` soft-delete.
+- Alembic: `0002_product_master`.
+
 ## Keyingi qadamlar (eslatma)
 
-- Birinchi ishga tushirish: `alembic upgrade head`, keyin `python scripts/seed.py`, so‘ng login.
+- Birinchi ishga tushirish: migratsiya (startup yoki `alembic upgrade head`), `.env` da `ADMIN_*`, `python scripts/seed.py`, login.
 - Alembic: yangi modellar uchun `revision --autogenerate`.
 - Render: `DATABASE_URL`, `SECRET_KEY`, migratsiya (`alembic upgrade head`).
 
@@ -63,5 +76,7 @@ Bu fayl loyihada bajarilgan asosiy ishlarni va qararlarni yozib borish uchun. **
 |------|----------------|
 | 2026-03-21 | Fondatsiya, flatten repo, Render, GitHub sync, JWT auth |
 | 2026-03-21 | Bootstrap seed, GET /auth/me, require_admin, JWT user_id claim |
+| 2026-03-21 | Startup migrations, /health, logging, ADMIN_* env, JWT faqat user_id+company_id |
+| 2026-03-21 | Product master: categories, units, products + migratsiya 0002 |
 
 *Yangi qatorlarni yuqoriga yoki shu jadvalga qo‘shing.*

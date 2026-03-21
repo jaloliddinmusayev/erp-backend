@@ -10,7 +10,10 @@ from app.core.database import Base
 
 if TYPE_CHECKING:
     from app.models.branch import Branch
+    from app.models.category import Category
+    from app.models.product import Product
     from app.models.role import Role
+    from app.models.unit import Unit
     from app.models.user import User
     from app.models.warehouse import Warehouse
 
@@ -55,3 +58,6 @@ class Company(Base):
     )
     # Warehouses also hang off `Branch`; DB CASCADE on `company_id` cleans them if company is removed.
     warehouses: Mapped[list["Warehouse"]] = relationship(back_populates="company")
+    categories: Mapped[list["Category"]] = relationship(back_populates="company", cascade="all, delete-orphan")
+    units: Mapped[list["Unit"]] = relationship(back_populates="company", cascade="all, delete-orphan")
+    products: Mapped[list["Product"]] = relationship(back_populates="company", cascade="all, delete-orphan")
