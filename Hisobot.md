@@ -68,6 +68,22 @@ Bu fayl loyihada bajarilgan asosiy ishlarni va qararlarni yozib borish uchun. **
 - `/clients` — JWT; `GET /` da `search`, `is_active` query.
 - Alembic: `0003_clients`.
 
+## 2026-03-21 — Sotuv buyurtmalari (sales orders)
+
+- Modellar: `SalesOrder`, `SalesOrderItem` (`company_id`, `order_number` per tenant noyob).
+- `line_total`, `total_amount` — backend; `PUT` faqat `draft`; `confirm` / `cancel` / `deactivate` + lifecycle endpointlar (to‘liq ro‘yxat: WMS tayyorligi bo‘limi).
+- `/sales-orders` — JWT; ro‘yxatda `status`, `fulfillment_status`, `client_id`, sanalar, `search`.
+- Alembic: `0004_sales_orders` (asosiy jadval), keyin `0005` (qator `ordered_qty` / fulfillment).
+
+## 2026-03-21 — Sales orders: WMS tayyorligi
+
+- `status` kengaytirildi: `sent_to_wms`, `in_progress`, `completed` (+ avvalgilar).
+- Sarlavha: `fulfillment_status` (pending / partial / fulfilled), `fulfilled_at`, `is_sent_to_wms`.
+- Qator: `ordered_qty`, `fulfilled_qty`; qoldiq API da hisoblanadi.
+- Endpointlar: `send-to-wms`, `mark-in-progress`, `update-fulfillment`, `complete`.
+- Kelajak uchun: `app/integration/wms/` (hozircha faqat izoh).
+- Alembic: `0005_sales_order_wms_fulfillment`.
+
 ## 2026-03-21 — Hisobot va izohlar
 
 - JWT bo‘yicha faqat `user_id`, `company_id`, `exp` qoldirildi; `app/core/security.py` modul izohi moslashtirildi.
@@ -92,5 +108,7 @@ Bu fayl loyihada bajarilgan asosiy ishlarni va qararlarni yozib borish uchun. **
 | 2026-03-21 | Product master: categories, units, products + migratsiya 0002 |
 | 2026-03-21 | Clients master + migratsiya 0003 |
 | 2026-03-21 | Hisobot: JWT/seed matnlari, termin «omborlar» |
+| 2026-03-21 | Sales orders + migratsiya 0004 |
+| 2026-03-21 | Sales orders WMS tayyorligi + migratsiya 0005 |
 
 *Yangi qatorlarni yuqoriga yoki shu jadvalga qo‘shing.*

@@ -14,6 +14,7 @@ if TYPE_CHECKING:
     from app.models.client import Client
     from app.models.product import Product
     from app.models.role import Role
+    from app.models.sales_order import SalesOrder, SalesOrderItem
     from app.models.unit import Unit
     from app.models.user import User
     from app.models.warehouse import Warehouse
@@ -63,3 +64,8 @@ class Company(Base):
     units: Mapped[list["Unit"]] = relationship(back_populates="company", cascade="all, delete-orphan")
     products: Mapped[list["Product"]] = relationship(back_populates="company", cascade="all, delete-orphan")
     clients: Mapped[list["Client"]] = relationship(back_populates="company", cascade="all, delete-orphan")
+    sales_orders: Mapped[list["SalesOrder"]] = relationship(back_populates="company", cascade="all, delete-orphan")
+    sales_order_items: Mapped[list["SalesOrderItem"]] = relationship(
+        back_populates="company",
+        cascade="all, delete-orphan",
+    )

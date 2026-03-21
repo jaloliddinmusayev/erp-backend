@@ -8,6 +8,7 @@ from app.core.database import Base
 
 if TYPE_CHECKING:
     from app.models.company import Company
+    from app.models.sales_order import SalesOrder
     from app.models.warehouse import Warehouse
 
 
@@ -35,3 +36,4 @@ class Branch(Base):
 
     company: Mapped["Company"] = relationship(back_populates="branches")
     warehouses: Mapped[list["Warehouse"]] = relationship(back_populates="branch", cascade="all, delete-orphan")
+    sales_orders: Mapped[list["SalesOrder"]] = relationship(back_populates="branch")
