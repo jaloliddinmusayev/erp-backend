@@ -1,7 +1,7 @@
 """
 Password hashing (bcrypt) and JWT issue/verify.
 
-JWT claims: `user_id`, `company_id`, `exp` only (no `sub`).
+JWT claims: `user_id`, `company_id`, `exp`.
 """
 
 from datetime import UTC, datetime, timedelta

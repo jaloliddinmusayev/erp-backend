@@ -16,7 +16,7 @@ Bu fayl loyihada bajarilgan asosiy ishlarni va qararlarni yozib borish uchun. **
 
 ## 2026-03-21 — Asosiy fondatsiya
 
-- FastAPI ilova: kompaniyalar, rollar, foydalanuvchilar, filiallar, ombxorlar.
+- FastAPI ilova: kompaniyalar, rollar, foydalanuvchilar, filiallar, omborlar.
 - `app/core`: `config`, `database`, `dependencies`, `security`, `exceptions`.
 - Alembic: boshlang‘ich migratsiya `0001_initial_schema`.
 - Ko‘p ijarachi tuzilma: barcha tenant jadvallarida `company_id`.
@@ -34,7 +34,7 @@ Bu fayl loyihada bajarilgan asosiy ishlarni va qararlarni yozib borish uchun. **
 
 ## 2026-03-21 — JWT autentifikatsiya
 
-- `POST /auth/login` — email + parol → `access_token` (JWT: `sub` = user id, `company_id`).
+- `POST /auth/login` — email + parol → `access_token` (JWT: `user_id`, `company_id`, `exp`).
 - `get_current_user` — `Authorization: Bearer`; noto‘g‘ri token **401**.
 - Himoya: `companies`, `users`, `branches`, shuningdek `roles` va `warehouses` (tenant konteksti uchun).
 - Ro‘yxat endpointlarida `company_id` query olib tashlandi; tenant `current_user.company_id` dan.
@@ -42,9 +42,9 @@ Bu fayl loyihada bajarilgan asosiy ishlarni va qararlarni yozib borish uchun. **
 
 ## 2026-03-21 — Bootstrap, `/auth/me`, admin tekshiruvi
 
-- **Seed:** `app/services/bootstrap_service.py` + `scripts/seed.py` — idempotent: kompaniya `core`, rol `admin`, foydalanuvchi `admin@erp.uz` / `123456` (faqat bo‘sh DB uchun). **Ilovani har ishga tushirishda emas**, alohida skript (multi-instance xavfsiz).
+- **Seed:** `app/services/bootstrap_service.py` + `scripts/seed.py` — idempotent: kompaniya `core`, rol `admin`, foydalanuvchi `.env` dagi `ADMIN_EMAIL` / `ADMIN_PASSWORD` bo‘yicha (faqat bo‘sh DB uchun). **Ilovani har ishga tushirishda emas**, alohida skript (multi-instance xavfsiz).
 - **GET `/auth/me`** — JWT bilan joriy foydalanuvchi + rol.
-- JWT da `user_id` + `company_id` (eski tokenlarda faqat `sub` bo‘lishi mumkin).
+- JWT da `user_id`, `company_id`, `exp`.
 - `get_current_user` — `joinedload` orqali rol; `require_admin` — yangi kompaniya / foydalanuvchi / rol yaratish uchun (POST `/companies`, `/users`, `/roles`).
 
 ---
@@ -53,7 +53,7 @@ Bu fayl loyihada bajarilgan asosiy ishlarni va qararlarni yozib borish uchun. **
 
 - **Lifespan:** DB `SELECT 1`, logging, `alembic upgrade head` (`RUN_MIGRATIONS_ON_STARTUP`, Render uchun).
 - **GET `/health`** — `{"status":"ok"}`.
-- **JWT:** faqat `user_id`, `company_id`, `exp` (`sub` yo‘q).
+- **JWT:** `user_id`, `company_id`, `exp`.
 - **Seed:** `ADMIN_EMAIL`, `ADMIN_PASSWORD` (`.env`); hardcode parol olib tashlandi.
 
 ## 2026-03-21 — Mahsulot master ma’lumotlari
@@ -67,6 +67,12 @@ Bu fayl loyihada bajarilgan asosiy ishlarni va qararlarni yozib borish uchun. **
 - Model `Client` (`company_id`, noyob `code` per tenant, `contact_person`, qidiruv: kod/nom/telefon).
 - `/clients` — JWT; `GET /` da `search`, `is_active` query.
 - Alembic: `0003_clients`.
+
+## 2026-03-21 — Hisobot va izohlar
+
+- JWT bo‘yicha faqat `user_id`, `company_id`, `exp` qoldirildi; `app/core/security.py` modul izohi moslashtirildi.
+- Seed tavsifida aniq parol ko‘rsatilmaydi — faqat `ADMIN_EMAIL` / `ADMIN_PASSWORD` (.env).
+- Terminologiya: omborlar (Hisobotda bir xil yozilish).
 
 ## Keyingi qadamlar (eslatma)
 
@@ -85,5 +91,6 @@ Bu fayl loyihada bajarilgan asosiy ishlarni va qararlarni yozib borish uchun. **
 | 2026-03-21 | Startup migrations, /health, logging, ADMIN_* env, JWT faqat user_id+company_id |
 | 2026-03-21 | Product master: categories, units, products + migratsiya 0002 |
 | 2026-03-21 | Clients master + migratsiya 0003 |
+| 2026-03-21 | Hisobot: JWT/seed matnlari, termin «omborlar» |
 
 *Yangi qatorlarni yuqoriga yoki shu jadvalga qo‘shing.*
