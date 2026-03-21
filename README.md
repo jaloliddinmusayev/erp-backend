@@ -16,7 +16,7 @@ Phase 1 foundation for a **multi-tenant ERP** API: shared PostgreSQL today, sche
 ## Quick start
 
 ```bash
-cd erp-backend
+# repozitoriya ildizidan
 python -m venv .venv
 # Windows:
 .\.venv\Scripts\activate
@@ -80,23 +80,21 @@ List endpoints take **`company_id` as a query parameter** until JWT + `current_u
 
 ## Deploy on Render
 
-Repozitoriyada kod `erp-backend/` papkasida bo‘lgani uchun Render **Root Directory** ni shu papkaga qo‘yish kerak — aks holda `requirements.txt topilmadi` xatosi chiqadi.
+Loyiha fayllari **repozitoriya ildizida** (`requirements.txt`, `app/`, `alembic/`). Render’da **Root Directory** ni **bo‘sh** qoldiring (yoki `.`).
 
 ### Variant A — `render.yaml` (Blueprint)
 
-Repozitoriya ildizida `render.yaml` bor. Render dashboard: **New → Blueprint** yoki mavjud servisni blueprint bilan bog‘lang. `DATABASE_URL` ni **Environment** da qo‘lda qo‘shing (masalan Render PostgreSQL ichki URL).
+`render.yaml` ildizda. **New → Blueprint** yoki mavjud servisni yangilang. `DATABASE_URL` ni **Environment** da qo‘shing (Render PostgreSQL internal URL).
 
 ### Variant B — qo‘lda Web Service
 
-1. **Root Directory:** `erp-backend`  
+1. **Root Directory:** bo‘sh  
 2. **Build Command:** `pip install --upgrade pip && pip install -r requirements.txt`  
-3. **Start Command:** `uvicorn app.main:app --host 0.0.0.0 --port $PORT`  
-4. **Environment:** `PYTHON_VERSION` = `3.12.8` (yoki `runtime.txt` ishlatiladi)  
-5. **DATABASE_URL**, **SECRET_KEY** va boshqa kalitlar — `.env.example` ga qarang.
+3. **Start Command:** `uvicorn app.main:app --host 0.0.0.0 --port $PORT` (Render `$PORT` o‘zgaruvchisidan foydalanadi — qat’iy `10000` yozmang)  
+4. **Environment:** `PYTHON_VERSION` = `3.12.8` yoki `runtime.txt`  
+5. **DATABASE_URL**, **SECRET_KEY** — `.env.example` ga qarang.
 
-**Migratsiya:** PostgreSQL ulangach, bir marta `alembic upgrade head` ni ishga tushiring (lokal yoki Render shell / one-off job). Ilova ishga tushishi uchun jadvalar kerak.
-
-**Eslatma:** `pip install -r requirements.txt` faqat repozitoriya **ildizida** emas, **`erp-backend` ichida** ishlashi kerak — buni Root Directory hal qiladi.
+**Migratsiya:** PostgreSQL ulangach, bir marta `alembic upgrade head` (shell yoki one-off).
 
 ## Future work (by design)
 
