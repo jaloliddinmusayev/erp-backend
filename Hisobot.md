@@ -62,6 +62,12 @@ Bu fayl loyihada bajarilgan asosiy ishlarni va qararlarni yozib borish uchun. **
 - Servislar va route’lar: `/categories`, `/units`, `/products` — faqat JWT; `deactivate` soft-delete.
 - Alembic: `0002_product_master`.
 
+## 2026-03-21 — Mijozlar (clients)
+
+- Model `Client` (`company_id`, noyob `code` per tenant, `contact_person`, qidiruv: kod/nom/telefon).
+- `/clients` — JWT; `GET /` da `search`, `is_active` query.
+- Alembic: `0003_clients`.
+
 ## Keyingi qadamlar (eslatma)
 
 - Birinchi ishga tushirish: migratsiya (startup yoki `alembic upgrade head`), `.env` da `ADMIN_*`, `python scripts/seed.py`, login.
@@ -78,5 +84,6 @@ Bu fayl loyihada bajarilgan asosiy ishlarni va qararlarni yozib borish uchun. **
 | 2026-03-21 | Bootstrap seed, GET /auth/me, require_admin, JWT user_id claim |
 | 2026-03-21 | Startup migrations, /health, logging, ADMIN_* env, JWT faqat user_id+company_id |
 | 2026-03-21 | Product master: categories, units, products + migratsiya 0002 |
+| 2026-03-21 | Clients master + migratsiya 0003 |
 
 *Yangi qatorlarni yuqoriga yoki shu jadvalga qo‘shing.*

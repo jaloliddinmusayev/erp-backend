@@ -6,7 +6,7 @@ from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
 
-from app.api.routes import auth, branches, categories, companies, products, roles, units, users, warehouses
+from app.api.routes import auth, branches, categories, clients, companies, products, roles, units, users, warehouses
 from app.core.config import get_settings
 from app.core.lifecycle import run_startup_hooks
 
@@ -30,6 +30,7 @@ app.include_router(warehouses.router, prefix="/warehouses", tags=["warehouses"])
 app.include_router(categories.router, prefix="/categories", tags=["categories"])
 app.include_router(units.router, prefix="/units", tags=["units"])
 app.include_router(products.router, prefix="/products", tags=["products"])
+app.include_router(clients.router, prefix="/clients", tags=["clients"])
 
 
 @app.get("/")

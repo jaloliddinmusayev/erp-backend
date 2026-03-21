@@ -11,6 +11,7 @@ from app.core.database import Base
 if TYPE_CHECKING:
     from app.models.branch import Branch
     from app.models.category import Category
+    from app.models.client import Client
     from app.models.product import Product
     from app.models.role import Role
     from app.models.unit import Unit
@@ -61,3 +62,4 @@ class Company(Base):
     categories: Mapped[list["Category"]] = relationship(back_populates="company", cascade="all, delete-orphan")
     units: Mapped[list["Unit"]] = relationship(back_populates="company", cascade="all, delete-orphan")
     products: Mapped[list["Product"]] = relationship(back_populates="company", cascade="all, delete-orphan")
+    clients: Mapped[list["Client"]] = relationship(back_populates="company", cascade="all, delete-orphan")

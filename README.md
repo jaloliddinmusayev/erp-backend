@@ -3,7 +3,7 @@
 Phase 1 foundation for a **multi-tenant ERP** API: shared PostgreSQL today, schema and services structured so **dedicated database per company** and **JWT-scoped tenant context** can be added without rewriting the domain layer.
 
 - **Not in scope yet:** WMS integration (will be HTTP/API clients later), Docker.
-- **In scope:** Companies (`tenant_mode`: `shared` | `dedicated`), roles, users, branches, warehouses, **product master** (`categories`, `units`, `products`) — tenant via JWT `company_id`.
+- **In scope:** Companies (`tenant_mode`: `shared` | `dedicated`), roles, users, branches, warehouses, product master (`categories`, `units`, `products`), **clients** — tenant via JWT `company_id`.
 
 ## Stack
 
@@ -36,11 +36,11 @@ Create the database (e.g. `erp_db`), then:
 # Optional: auto-generate future revisions after model changes (requires DB URL):
 # alembic revision --autogenerate -m "describe change"
 
-# Apply schema (revisions 0001 + 0002 product master):
+# Apply schema (includes 0001 core, 0002 product master, 0003 clients):
 alembic upgrade head
 ```
 
-New installs after pulling product master: ensure `alembic upgrade head` (or rely on app startup migrations on Render).
+After pulling new modules: run `alembic upgrade head` (or rely on startup migrations on Render when enabled).
 
 ### Initial seed (first admin)
 
@@ -66,7 +66,7 @@ Creates company **`core`**, role **`admin`**, and the admin user if missing. Ide
 
 **Admin-only:** `POST /companies`, `POST /users`, `POST /roles` require role code `admin`.
 
-Shipped revisions: **`0001_initial_schema`**, **`0002_product_master`** (categories, units, products). Further changes: `alembic revision --autogenerate`.
+Shipped revisions: **`0001_initial_schema`**, **`0002_product_master`**, **`0003_clients`**. Further changes: `alembic revision --autogenerate`.
 
 ### Run the API
 
@@ -99,6 +99,7 @@ On startup the app logs DB connectivity and runs `alembic upgrade head` when `RU
 | `/categories` | CRUD + `PATCH .../deactivate` (JWT tenant) |
 | `/units`       | CRUD + `PATCH .../deactivate` (JWT tenant) |
 | `/products`    | CRUD + `PATCH .../deactivate`; optional `GET ?category_id=` filter |
+| `/clients`     | CRUD + `PATCH .../deactivate`; optional `GET ?search=&is_active=` |
 
 Tenant scope comes from **`Authorization: Bearer`** (`company_id` in JWT). **Do not** send `company_id` in bodies for these resources.
 
