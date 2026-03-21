@@ -1,0 +1,26 @@
+# Render Blueprint: https://render.com/docs/blueprint-spec
+# Loyiha fayllari `erp-backend/` ostida — shuning uchun rootDir muhim.
+
+services:
+  - type: web
+    name: erp-backend
+    runtime: python
+    rootDir: erp-backend
+    buildCommand: pip install --upgrade pip && pip install -r requirements.txt
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: PYTHON_VERSION
+        value: "3.12.8"
+      - key: APP_NAME
+        value: Core ERP API
+      - key: DEBUG
+        value: "false"
+      # Render PostgreSQL ulanishi: dashboardda Internal Database URL ni qo'ying
+      - key: DATABASE_URL
+        sync: false
+      - key: SECRET_KEY
+        generateValue: true
+      - key: ACCESS_TOKEN_EXPIRE_MINUTES
+        value: "30"
+      - key: JWT_ALGORITHM
+        value: HS256

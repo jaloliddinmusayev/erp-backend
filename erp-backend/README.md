@@ -78,6 +78,26 @@ List endpoints take **`company_id` as a query parameter** until JWT + `current_u
 - `app/services` — tenant-aware business logic (explicit `company_id` parameters)  
 - `app/api/routes` — thin HTTP layer  
 
+## Deploy on Render
+
+Repozitoriyada kod `erp-backend/` papkasida bo‘lgani uchun Render **Root Directory** ni shu papkaga qo‘yish kerak — aks holda `requirements.txt topilmadi` xatosi chiqadi.
+
+### Variant A — `render.yaml` (Blueprint)
+
+Repozitoriya ildizida `render.yaml` bor. Render dashboard: **New → Blueprint** yoki mavjud servisni blueprint bilan bog‘lang. `DATABASE_URL` ni **Environment** da qo‘lda qo‘shing (masalan Render PostgreSQL ichki URL).
+
+### Variant B — qo‘lda Web Service
+
+1. **Root Directory:** `erp-backend`  
+2. **Build Command:** `pip install --upgrade pip && pip install -r requirements.txt`  
+3. **Start Command:** `uvicorn app.main:app --host 0.0.0.0 --port $PORT`  
+4. **Environment:** `PYTHON_VERSION` = `3.12.8` (yoki `runtime.txt` ishlatiladi)  
+5. **DATABASE_URL**, **SECRET_KEY** va boshqa kalitlar — `.env.example` ga qarang.
+
+**Migratsiya:** PostgreSQL ulangach, bir marta `alembic upgrade head` ni ishga tushiring (lokal yoki Render shell / one-off job). Ilova ishga tushishi uchun jadvalar kerak.
+
+**Eslatma:** `pip install -r requirements.txt` faqat repozitoriya **ildizida** emas, **`erp-backend` ichida** ishlashi kerak — buni Root Directory hal qiladi.
+
 ## Future work (by design)
 
 - **Dedicated DB:** resolve `Session`/engine from `Company.tenant_mode` + connection registry; keep service function signatures that accept `db` and `company_id`.  
