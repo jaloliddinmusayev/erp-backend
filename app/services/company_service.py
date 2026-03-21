@@ -27,3 +27,8 @@ def create_company(db: Session, payload: CompanyCreate) -> Company:
 def list_companies(db: Session, *, skip: int = 0, limit: int = 100) -> list[Company]:
     stmt = select(Company).order_by(Company.id).offset(skip).limit(min(limit, 500))
     return list(db.scalars(stmt).all())
+
+
+def list_companies_for_tenant(db: Session, *, company_id: int) -> list[Company]:
+    company = db.get(Company, company_id)
+    return [company] if company is not None else []

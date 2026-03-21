@@ -1,11 +1,8 @@
 """
-Password hashing and JWT helpers (scaffolding).
+Password hashing (bcrypt) and JWT issue/verify.
 
-Full OAuth2/JWT login routes come in a later phase; keep crypto utilities here
-so services and future auth share one implementation.
-
-Role-based permissions: future middleware/dependencies can decode JWT claims
-and check role codes against route metadata.
+Access tokens carry `sub` (user id) and `company_id` for tenant scoping.
+Expiration: `Settings.access_token_expire_minutes`.
 """
 
 from datetime import UTC, datetime, timedelta

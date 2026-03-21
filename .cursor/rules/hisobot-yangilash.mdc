@@ -1,0 +1,17 @@
+---
+description: Hisobot.md ni muhim o'zgarishlardan keyin yangilash
+alwaysApply: true
+---
+
+# Hisobot.md ni yangilab borish
+
+1. **Hisobot.md** repozitoriya ildizida (`Hisobot.md`) — loyiha bo‘yicha bajarilgan ishlar va qaralarning yozma hisoboti.
+2. Quyidagi holatlarda **har safar** `Hisobot.md` ga qisqa yozuv qo‘shing (sana + 2–5 jumla):
+   - yangi modul / API / xavfsizlik xususiyati;
+   - tuzilma yoki deploy o‘zgarishi;
+   - muhim xato tuzatishlari;
+   - migratsiya yoki konfiguratsiya qarorlari.
+3. Kerak bo‘lsa **«O‘zgartirishlar jadvali»** ga bir qator qo‘shing.
+4. Juda mayda refactor yoki faqat formatlash uchun Hisobotni kengaytirish shart emas.
+
+Agar foydalanuvchi «faqat hisobotni yangila» desa, avvalgi ish kontekstiga qarab `Hisobot.md` ni yangilang.

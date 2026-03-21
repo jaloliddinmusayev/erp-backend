@@ -1,16 +1,20 @@
-from fastapi import APIRouter, Depends, HTTPException, Query, status
+from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
-from app.core.dependencies import get_db
+from app.core.dependencies import get_current_user, get_db
 from app.core.exceptions import ConflictError
+from app.models.user import User
 from app.schemas.company import CompanyCreate, CompanyResponse
 from app.services import company_service
 
-router = APIRouter()
+router = APIRouter(dependencies=[Depends(get_current_user)])
 
 
 @router.post("/", response_model=CompanyResponse, status_code=status.HTTP_201_CREATED)
-def create_company(payload: CompanyCreate, db: Session = Depends(get_db)) -> CompanyResponse:
+def create_company(
+    payload: CompanyCreate,
+    db: Session = Depends(get_db),
+) -> CompanyResponse:
     try:
         company = company_service.create_company(db, payload)
     except ConflictError as e:
@@ -21,8 +25,10 @@ def create_company(payload: CompanyCreate, db: Session = Depends(get_db)) -> Com
 @router.get("/", response_model=list[CompanyResponse])
 def list_companies(
     db: Session = Depends(get_db),
-    skip: int = Query(0, ge=0),
-    limit: int = Query(100, ge=1, le=500),
+    current_user: User = Depends(get_current_user),
 ) -> list[CompanyResponse]:
-    companies = company_service.list_companies(db, skip=skip, limit=limit)
+    companies = company_service.list_companies_for_tenant(
+        db,
+        company_id=current_user.company_id,
+    )
     return [CompanyResponse.model_validate(c) for c in companies]

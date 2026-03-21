@@ -10,6 +10,10 @@ from app.models.user import User
 from app.schemas.user import UserCreate
 
 
+def get_user_by_id(db: Session, user_id: int) -> User | None:
+    return db.get(User, user_id)
+
+
 def _get_company(db: Session, company_id: int) -> Company:
     company = db.get(Company, company_id)
     if company is None:

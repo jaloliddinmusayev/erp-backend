@@ -6,12 +6,13 @@ Future: WMS integration via outbound HTTP clients; keep domain logic isolated he
 
 from fastapi import FastAPI
 
-from app.api.routes import branches, companies, roles, users, warehouses
+from app.api.routes import auth, branches, companies, roles, users, warehouses
 from app.core.config import get_settings
 
 settings = get_settings()
 app = FastAPI(title=settings.app_name)
 
+app.include_router(auth.router, prefix="/auth", tags=["auth"])
 app.include_router(companies.router, prefix="/companies", tags=["companies"])
 app.include_router(roles.router, prefix="/roles", tags=["roles"])
 app.include_router(users.router, prefix="/users", tags=["users"])
