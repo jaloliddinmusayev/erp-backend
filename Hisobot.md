@@ -40,11 +40,18 @@ Bu fayl loyihada bajarilgan asosiy ishlarni va qararlarni yozib borish uchun. **
 - Ro‘yxat endpointlarida `company_id` query olib tashlandi; tenant `current_user.company_id` dan.
 - Create body dagi `company_id` joriy foydalanuvchi tenantiga majburan moslashtiriladi.
 
+## 2026-03-21 — Bootstrap, `/auth/me`, admin tekshiruvi
+
+- **Seed:** `app/services/bootstrap_service.py` + `scripts/seed.py` — idempotent: kompaniya `core`, rol `admin`, foydalanuvchi `admin@erp.uz` / `123456` (faqat bo‘sh DB uchun). **Ilovani har ishga tushirishda emas**, alohida skript (multi-instance xavfsiz).
+- **GET `/auth/me`** — JWT bilan joriy foydalanuvchi + rol.
+- JWT da `user_id` + `company_id` (eski tokenlarda faqat `sub` bo‘lishi mumkin).
+- `get_current_user` — `joinedload` orqali rol; `require_admin` — yangi kompaniya / foydalanuvchi / rol yaratish uchun (POST `/companies`, `/users`, `/roles`).
+
 ---
 
 ## Keyingi qadamlar (eslatma)
 
-- Birinchi kompaniya / admin foydalanuvchi: hozircha token talab qilinadi — seed yoki DB orqali boshlang‘ich yozuvlar.
+- Birinchi ishga tushirish: `alembic upgrade head`, keyin `python scripts/seed.py`, so‘ng login.
 - Alembic: yangi modellar uchun `revision --autogenerate`.
 - Render: `DATABASE_URL`, `SECRET_KEY`, migratsiya (`alembic upgrade head`).
 
@@ -55,5 +62,6 @@ Bu fayl loyihada bajarilgan asosiy ishlarni va qararlarni yozib borish uchun. **
 | Sana | Qisqa mazmun |
 |------|----------------|
 | 2026-03-21 | Fondatsiya, flatten repo, Render, GitHub sync, JWT auth |
+| 2026-03-21 | Bootstrap seed, GET /auth/me, require_admin, JWT user_id claim |
 
 *Yangi qatorlarni yuqoriga yoki shu jadvalga qo‘shing.*

@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.orm import Session
 
-from app.core.dependencies import get_current_user, get_db
+from app.core.dependencies import get_current_user, get_db, require_admin
 from app.core.exceptions import ConflictError, NotFoundError
 from app.models.user import User
 from app.schemas.role import RoleCreate, RoleResponse
@@ -10,7 +10,12 @@ from app.services import role_service
 router = APIRouter(dependencies=[Depends(get_current_user)])
 
 
-@router.post("/", response_model=RoleResponse, status_code=status.HTTP_201_CREATED)
+@router.post(
+    "/",
+    response_model=RoleResponse,
+    status_code=status.HTTP_201_CREATED,
+    dependencies=[Depends(require_admin)],
+)
 def create_role(
     payload: RoleCreate,
     db: Session = Depends(get_db),

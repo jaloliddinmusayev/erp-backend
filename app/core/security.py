@@ -1,7 +1,9 @@
 """
 Password hashing (bcrypt) and JWT issue/verify.
 
-Access tokens carry `sub` (user id) and `company_id` for tenant scoping.
+Access tokens carry:
+  - `sub` / `user_id`: user primary key
+  - `company_id`: tenant
 Expiration: `Settings.access_token_expire_minutes`.
 """
 

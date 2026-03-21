@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
-from app.core.dependencies import get_current_user, get_db
+from app.core.dependencies import get_current_user, get_db, require_admin
 from app.core.exceptions import ConflictError
 from app.models.user import User
 from app.schemas.company import CompanyCreate, CompanyResponse
@@ -10,7 +10,12 @@ from app.services import company_service
 router = APIRouter(dependencies=[Depends(get_current_user)])
 
 
-@router.post("/", response_model=CompanyResponse, status_code=status.HTTP_201_CREATED)
+@router.post(
+    "/",
+    response_model=CompanyResponse,
+    status_code=status.HTTP_201_CREATED,
+    dependencies=[Depends(require_admin)],
+)
 def create_company(
     payload: CompanyCreate,
     db: Session = Depends(get_db),

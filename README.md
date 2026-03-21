@@ -2,7 +2,7 @@
 
 Phase 1 foundation for a **multi-tenant ERP** API: shared PostgreSQL today, schema and services structured so **dedicated database per company** and **JWT-scoped tenant context** can be added without rewriting the domain layer.
 
-- **Not in scope yet:** WMS integration (will be HTTP/API clients later), Docker, full auth routes.
+- **Not in scope yet:** WMS integration (will be HTTP/API clients later), Docker.
 - **In scope:** Companies (`tenant_mode`: `shared` | `dedicated`), roles, users, branches, warehouses — all tenant-owned rows carry `company_id`.
 
 ## Stack
@@ -39,6 +39,24 @@ Create the database (e.g. `erp_db`), then:
 # Apply schema (includes initial revision 0001):
 alembic upgrade head
 ```
+
+### Initial seed (first admin)
+
+From repo root (after migrations, `.env` with `DATABASE_URL`):
+
+```bash
+python scripts/seed.py
+```
+
+Creates company **`core`** (Core ERP Demo), role **`admin`**, user **`admin@erp.uz`** / password **`123456`** if missing. Safe to run multiple times.
+
+### Auth flow (example)
+
+1. `POST /auth/login` with `{"email":"admin@erp.uz","password":"123456"}` → `access_token`  
+2. `GET /auth/me` with header `Authorization: Bearer <token>` → user + role  
+3. Use the same header for other protected routes.
+
+**Admin-only:** `POST /companies`, `POST /users`, `POST /roles` require role code `admin`.
 
 The repository ships with revision **`0001_initial_schema`**. Use `alembic revision --autogenerate` for **subsequent** changes once models evolve.
 

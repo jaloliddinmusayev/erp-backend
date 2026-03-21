@@ -9,3 +9,17 @@ class LoginRequest(BaseModel):
 class TokenResponse(BaseModel):
     access_token: str
     token_type: str = "bearer"
+
+
+class MeRoleOut(BaseModel):
+    id: int
+    code: str
+    name: str
+
+
+class MeResponse(BaseModel):
+    user_id: int
+    full_name: str
+    email: str
+    company_id: int
+    role: MeRoleOut

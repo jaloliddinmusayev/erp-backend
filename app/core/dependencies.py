@@ -14,6 +14,8 @@ from app.core.security import decode_access_token
 from app.models.user import User
 from app.services import user_service
 
+ADMIN_ROLE_CODE = "admin"
+
 http_bearer = HTTPBearer(auto_error=False)
 
 
@@ -60,7 +62,7 @@ def get_current_user(
             headers={"WWW-Authenticate": "Bearer"},
         ) from None
 
-    user = user_service.get_user_by_id(db, user_id)
+    user = user_service.get_user_by_id(db, user_id, load_role=True)
     if user is None or not user.is_active:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -73,4 +75,30 @@ def get_current_user(
             detail="Invalid token payload",
             headers={"WWW-Authenticate": "Bearer"},
         )
+    uid_claim = payload.get("user_id")
+    if uid_claim is not None:
+        try:
+            if int(uid_claim) != user.id:
+                raise HTTPException(
+                    status_code=status.HTTP_401_UNAUTHORIZED,
+                    detail="Invalid token payload",
+                    headers={"WWW-Authenticate": "Bearer"},
+                )
+        except (TypeError, ValueError):
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Invalid token payload",
+                headers={"WWW-Authenticate": "Bearer"},
+            ) from None
     return user
+
+
+def require_admin(current_user: Annotated[User, Depends(get_current_user)]) -> User:
+    """Admin: full access. Other roles: use fine-grained checks later."""
+    role = current_user.role
+    if role is None or not role.is_active or (role.code or "").lower() != ADMIN_ROLE_CODE:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Admin privileges required",
+        )
+    return current_user
