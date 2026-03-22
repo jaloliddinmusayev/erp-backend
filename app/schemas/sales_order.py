@@ -3,7 +3,8 @@ from decimal import ROUND_HALF_UP, Decimal
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
-from app.models.sales_order import FulfillmentStatus, SalesOrderStatus
+from app.models.integration_job import IntegrationJobStatus
+from app.models.sales_order import FulfillmentStatus, IntegrationStatus, SalesOrderStatus
 
 
 class ClientBrief(BaseModel):
@@ -118,6 +119,10 @@ class SalesOrderResponse(BaseModel):
     fulfillment_status: FulfillmentStatus
     fulfilled_at: datetime | None
     is_sent_to_wms: bool
+    wms_order_id: str | None
+    integration_status: IntegrationStatus
+    sent_to_wms_at: datetime | None
+    last_sync_error: str | None
     notes: str | None
     total_amount: Decimal
     is_active: bool
@@ -139,6 +144,10 @@ class SalesOrderListResponse(BaseModel):
     fulfillment_status: FulfillmentStatus
     fulfilled_at: datetime | None
     is_sent_to_wms: bool
+    wms_order_id: str | None
+    integration_status: IntegrationStatus
+    sent_to_wms_at: datetime | None
+    last_sync_error: str | None
     notes: str | None
     total_amount: Decimal
     is_active: bool
@@ -170,6 +179,10 @@ def sales_order_to_list_response(order) -> SalesOrderListResponse:
         fulfillment_status=order.fulfillment_status,
         fulfilled_at=order.fulfilled_at,
         is_sent_to_wms=order.is_sent_to_wms,
+        wms_order_id=order.wms_order_id,
+        integration_status=order.integration_status,
+        sent_to_wms_at=order.sent_to_wms_at,
+        last_sync_error=order.last_sync_error,
         notes=order.notes,
         total_amount=order.total_amount,
         is_active=order.is_active,
@@ -211,6 +224,10 @@ def sales_order_to_response(order) -> SalesOrderResponse:
         fulfillment_status=order.fulfillment_status,
         fulfilled_at=order.fulfilled_at,
         is_sent_to_wms=order.is_sent_to_wms,
+        wms_order_id=order.wms_order_id,
+        integration_status=order.integration_status,
+        sent_to_wms_at=order.sent_to_wms_at,
+        last_sync_error=order.last_sync_error,
         notes=order.notes,
         total_amount=order.total_amount,
         is_active=order.is_active,
@@ -220,3 +237,9 @@ def sales_order_to_response(order) -> SalesOrderResponse:
         branch=BranchBrief.model_validate(order.branch) if order.branch_id is not None else None,
         items=items_out,
     )
+
+
+class EnqueueWmsResponse(BaseModel):
+    order: SalesOrderResponse
+    integration_job_id: int
+    job_status: IntegrationJobStatus

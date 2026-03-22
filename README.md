@@ -3,7 +3,7 @@
 Phase 1 foundation for a **multi-tenant ERP** API: shared PostgreSQL today, schema and services structured so **dedicated database per company** and **JWT-scoped tenant context** can be added without rewriting the domain layer.
 
 - **Not in scope yet:** WMS integration (will be HTTP/API clients later), Docker.
-- **In scope:** Companies (`tenant_mode`: `shared` | `dedicated`), roles, users, branches, warehouses, product master (`categories`, `units`, `products`), clients, **sales orders** (ERP lifecycle + fulfillment fields; **real WMS HTTP client** still out of scope) — tenant via JWT `company_id`.
+- **In scope:** Companies (`tenant_mode`: `shared` | `dedicated`), roles, users, branches, warehouses, product master (`categories`, `units`, `products`), clients, **sales orders** (ERP lifecycle + fulfillment), **manual payments**, **invoices** (draft → issued → paid, line-item snapshot), **payment allocations**, **receivable aging** (bucketed by days past **due date**, or **invoice date** if `due_date` is null), **client statements** (chronological invoice vs payment lines + allocation audit notes) — tenant via JWT `company_id`. **Not yet:** bank feeds, GL journals.
 
 ## Stack
 
@@ -36,7 +36,7 @@ Create the database (e.g. `erp_db`), then:
 # Optional: auto-generate future revisions after model changes (requires DB URL):
 # alembic revision --autogenerate -m "describe change"
 
-# Apply schema (through 0005 sales order WMS prep: fulfillment columns, line qty rename):
+# Apply schema (through 0008: invoices + payment allocations):
 alembic upgrade head
 ```
 
@@ -66,9 +66,17 @@ Creates company **`core`**, role **`admin`**, and the admin user if missing. Ide
 
 **Admin-only:** `POST /companies`, `POST /users`, `POST /roles` require role code `admin`.
 
-Shipped revisions: **`0001_initial_schema`** … **`0005_sales_order_wms_fulfillment`**. Further changes: `alembic revision --autogenerate`.
+Shipped revisions: **`0001_initial_schema`** … **`0008_invoices_payment_allocations`**. Further changes: `alembic revision --autogenerate`.
 
-**Sales order lifecycle (ERP):** `draft` → `PATCH .../confirm` → `confirmed` → `PATCH .../send-to-wms` → `sent_to_wms` (`is_sent_to_wms=true`) → `PATCH .../mark-in-progress` → `in_progress` → `PATCH .../update-fulfillment` (body: per-line `fulfilled_qty`) → when every line is fully picked, `PATCH .../complete` → `completed` (`fulfilled_at` set). **`PUT` only in `draft`.** After `sent_to_wms`, no structural edits. **`cancelled`** is terminal; **`completed`** cannot be cancelled. Header **`fulfillment_status`** is `pending` | `partial` | `fulfilled` (derived from lines). Line fields: **`ordered_qty`**, **`fulfilled_qty`**, response **`remaining_qty`** (computed). Real WMS calls: placeholder package **`app/integration/wms/`** (hook noted in service after `send_to_wms`).
+**Accounts receivable (v1):** **`POST /invoices`** (manual lines + optional **`sales_order_id`**) or **`POST /invoices/from-sales-order/{id}`** (snapshot from confirmed-or-later order lines). Lifecycle: **`PATCH .../issue`** (sets **`outstanding_amount = total_amount`**), **`PATCH .../cancel`** (only if no allocations), **`PATCH .../deactivate`** (blocked if active allocations). **`POST /payment-allocations`** links an active **payment** to an **issued** invoice (same client); caps = payment **unallocated** amount and invoice **outstanding**. **`GET /payments/{id}/unallocated-amount`** for UI. Allocation rows are never hard-deleted; **`PATCH /payment-allocations/{id}/deactivate`** reverses balances via **`recalculate_invoice_balances`**. **Manual payments (order-level v1):** **`POST /payments`**, **`GET /payments/client-summary/{client_id}`**, **`GET /payments/sales-order-summary/{sales_order_id}`** — still order/payment based (not invoice AR aging).
+
+**Bank automation / GL / aging reports** remain future layers.
+
+**ERP → WMS outbound flow:** `confirmed` → **`POST /sales-orders/{id}/enqueue-wms`** (or **`PATCH .../send-to-wms`**) → `IntegrationJob` row (`pending`) + **`integration_status=pending`**. The **integration worker** (`python scripts/run_worker.py`) claims jobs with **`FOR UPDATE SKIP LOCKED`**, sets **`processing`**, calls the WMS adapter (`app/integration/wms/`), then **`finalize_worker_job_success`** (order → **`sent_to_wms`**, **`wms_order_id`**, **`sent_to_wms_at`**) or retries / **`failed`** after **`INTEGRATION_JOB_MAX_ATTEMPTS`**. Default **`WMS_MOCK_MODE=true`** (no HTTP). Set **`WMS_MOCK_MODE=false`**, **`WMS_BASE_URL`**, **`WMS_API_KEY`** when the vendor contract is ready (`HttpWmsClient` has **TODO** markers for path/response shape). Stale **`processing`** rows are reset to **`pending`** after **`INTEGRATION_JOB_STALE_PROCESSING_SECONDS`** (crash recovery). **Admin** **`PATCH /integration-jobs/{id}/mark-sent`** remains for manual testing. Inbound: **`POST /wms/callback/sales-orders/{id}`** (tenant JWT).
+
+**Worker process:** same **`DATABASE_URL`** as the API. Cron: `*/2 * * * * cd /app && python scripts/run_worker.py`. Long-running: **`INTEGRATION_WORKER_LOOP_SECONDS=60`**. **Render:** add a **Background Worker** with start command **`python scripts/run_worker.py`**.
+
+**Sales order lifecycle (summary):** unchanged after **`sent_to_wms`**. Header: **`integration_status`**, **`wms_order_id`**, **`last_sync_error`**. See **`app/workers/integration_worker.py`** and **`app/integration/wms/`**.
 
 ### Run the API
 
@@ -102,7 +110,17 @@ On startup the app logs DB connectivity and runs `alembic upgrade head` when `RU
 | `/units`       | CRUD + `PATCH .../deactivate` (JWT tenant) |
 | `/products`    | CRUD + `PATCH .../deactivate`; optional `GET ?category_id=` filter |
 | `/clients`     | CRUD + `PATCH .../deactivate`; optional `GET ?search=&is_active=` |
-| `/sales-orders` | CRUD-style: `POST /`, `GET /` (+ `status`, `fulfillment_status`, `client_id`, dates, `search`, `is_active`), `GET /{id}`, `PUT /{id}` (draft only); lifecycle: `PATCH .../confirm`, `send-to-wms`, `mark-in-progress`, `update-fulfillment`, `complete`, `cancel`, `deactivate` |
+| `/sales-orders` | CRUD + filters (`integration_status`, …); **`POST .../enqueue-wms`**; lifecycle patches as before |
+| `/integration-jobs` | `GET /`, `GET /{id}` (tenant); **`PATCH .../mark-sent`**, **`PATCH .../mark-failed`** (**admin** — worker simulation) |
+| `/wms` | **`POST /callback/sales-orders/{id}`** — fulfillment payload (tenant JWT) |
+| `/payments` | `POST /`, `GET /` (filters), `GET /{id}`, **`GET /{id}/unallocated-amount`**, `PATCH .../deactivate`; **`GET /client-summary/{client_id}`**, **`GET /sales-order-summary/{sales_order_id}`** |
+| `/invoices` | `POST /`, **`POST /from-sales-order/{sales_order_id}`**, `GET /` (filters), `GET /{id}`, `PUT /{id}` (draft only), **`PATCH .../issue`**, **`PATCH .../cancel`**, **`PATCH .../deactivate`** |
+| `/payment-allocations` | `POST /`, `GET /` (filters), `GET /{id}`, **`PATCH .../deactivate`** |
+| `/receivables` | **`GET /aging`** (tenant-wide buckets), **`GET /aging/invoices`** (detail; optional `client_id`), **`GET /aging/client/{client_id}`** (optional `include_invoices`), **`GET /statements/client/{client_id}`** (`date_from` / `date_to` optional) |
+
+**Aging:** Only **active** invoices with **`outstanding_amount > 0`**, excluding **draft** and **cancelled**. Buckets: **current** (not yet past due), **1–30**, **31–60**, **61–90**, **90+** days past due (calendar days from **`due_date`** or **`invoice_date`**). **`as_of_date`** defaults to today.
+
+**Client statement:** Posting lines are **invoice_issued** (debit) and **payment_received** (credit on `payment_date`). **payment_allocated** rows are **non-posting** (0 debit/credit) audit lines describing applications. With **`date_from`**, **opening_balance** is activity before that date; without a start date, opening is **0** and all history through **`date_to`** (or open-ended) is listed.
 
 Tenant scope comes from **`Authorization: Bearer`** (`company_id` in JWT). **Do not** send `company_id` in bodies for these resources.
 
@@ -113,7 +131,8 @@ Tenant scope comes from **`Authorization: Bearer`** (`company_id` in JWT). **Do 
 - `app/schemas` — Pydantic request/response DTOs  
 - `app/services` — tenant-aware business logic (explicit `company_id` parameters)  
 - `app/api/routes` — thin HTTP layer  
-- `app/integration` — future outbound adapters (e.g. WMS); no live integrations yet  
+- `app/integration/wms` — WMS adapter (`MockWmsClient` / `HttpWmsClient`) + `send_sales_order_payload`  
+- `app/workers` — background workers (`integration_worker` claims `IntegrationJob` rows)  
 
 ## Deploy on Render
 
@@ -139,4 +158,4 @@ Loyiha fayllari **repozitoriya ildizida** (`requirements.txt`, `app/`, `alembic/
 - **JWT auth:** `decode_access_token` / login routes; replace `company_id` query params with dependencies.  
 - **RBAC:** permission checks using `Role.code` and route metadata.  
 - **WMS:** outbound integration clients only — no WMS schema here.  
-- **More domains:** invoicing, payments, procurement, finance — same pattern: model + schema + service + router, always `company_id` on tenant data.
+- **More domains:** receivable aging / statements, bank reconciliation, GL postings, procurement — extend invoices / allocations without breaking `company_id` tenancy.

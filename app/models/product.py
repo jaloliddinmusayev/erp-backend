@@ -9,6 +9,7 @@ from app.core.database import Base
 if TYPE_CHECKING:
     from app.models.category import Category
     from app.models.company import Company
+    from app.models.invoice import InvoiceItem
     from app.models.sales_order import SalesOrderItem
     from app.models.unit import Unit
 
@@ -52,3 +53,4 @@ class Product(Base):
     category: Mapped["Category"] = relationship(back_populates="products")
     base_unit: Mapped["Unit"] = relationship(back_populates="products_as_base")
     sales_order_items: Mapped[list["SalesOrderItem"]] = relationship(back_populates="product")
+    invoice_items: Mapped[list["InvoiceItem"]] = relationship(back_populates="product")

@@ -1,6 +1,9 @@
 """
-Future WMS integration (outbound).
+WMS integration package.
 
-When implemented, call from `sales_order_service` after a successful `send_to_wms`
-transition — e.g. enqueue a job or POST to a WMS API. No external calls here yet.
+- `schemas` — outbound result / payload DTOs
+- `client` — `MockWmsClient`, `HttpWmsClient` (TODO: vendor contract)
+- `service` — `send_sales_order_payload` used by the integration worker
+
+Background worker: `python scripts/run_worker.py` (claims `IntegrationJob` rows, calls adapter).
 """

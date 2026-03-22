@@ -84,6 +84,49 @@ Bu fayl loyihada bajarilgan asosiy ishlarni va qararlarni yozib borish uchun. **
 - Kelajak uchun: `app/integration/wms/` (hozircha faqat izoh).
 - Alembic: `0005_sales_order_wms_fulfillment`.
 
+## 2026-03-21 — ERP → WMS integratsiya fondatsiyasi
+
+- `SalesOrder`: `wms_order_id`, `integration_status`, `sent_to_wms_at`, `last_sync_error`.
+- `IntegrationJob` (outbox): `payload_json`, `status`, `attempt_count`, tenant `company_id`.
+- `POST /sales-orders/{id}/enqueue-wms` — navbat; `PATCH send-to-wms` xuddi shu enqueue.
+- Admin: `PATCH /integration-jobs/{id}/mark-sent|mark-failed` (worker simulyatsiyasi).
+- `POST /wms/callback/sales-orders/{id}` — JWT tenant, fulfilled_qty yangilash.
+- Haqiqiy tashqi WMS HTTP hali yo‘q; worker keyin `integration_jobs` dan o‘qiydi.
+- Alembic: `0006_integration_jobs_wms_metadata`.
+
+## 2026-03-21 — WMS integration worker
+
+- `scripts/run_worker.py` — `pending` joblarni SKIP LOCKED bilan olish, `processing` → adapter → `sent` / qayta urinish / `failed`.
+- `app/integration/wms/client.py` — `MockWmsClient`, `HttpWmsClient` (TODO: URL, javob formati).
+- `app/integration/wms/service.py` — `send_sales_order_payload`.
+- Sozlamalar: `WMS_MOCK_MODE`, `INTEGRATION_JOB_MAX_ATTEMPTS`, `INTEGRATION_WORKER_BATCH_SIZE`, stale lease qayta tiklash.
+- Haqiqiy WMS shartnomasi tasdiqlanganda `HttpWmsClient` va mapping yangilanadi.
+
+## 2026-03-21 — Qo‘lda to‘lovlar (payments)
+
+- Model `Payment`: mijoz, ixtiyoriy `sales_order_id`, `amount`, `payment_date`, `payment_method` (cash / bank_transfer / card / other), `created_by_user_id`.
+- `/payments` — JWT; client/order tenant tekshiruvi; bekor buyurtmaga yangi to‘lov taqiq.
+- Qoldiq: `client-summary` (faol buyurtmalar `total_amount` yig‘indisi − faol to‘lovlar), `sales-order-summary` (shu buyurtmaga bog‘langan to‘lovlar).
+- `is_active=false` yig‘indilarga kirmaydi.
+- Bank integratsiyasi keyingi bosqich; hisob-faktura va allocatsiya — `0008` (quyida).
+- Alembic: `0007_payments`.
+
+## 2026-03-21 — Hisob-fakturalar va to‘lov taqsimoti (AR)
+
+- Modellar: `Invoice` (draft / issued / partially_paid / paid / cancelled), `InvoiceItem` (snapshot), `PaymentAllocation` (to‘lov ↔ faktura, `is_active` bilan yumshoq bekor, hard delete yo‘q).
+- `/invoices` — qo‘lda yoki `from-sales-order` (faqat confirmed+ buyurtma); `issue` dan keyin allocatsiya; `cancel` faqat allocatsiyasiz.
+- `/payment-allocations` — bir to‘lov bir nechta fakturaga; miqdor to‘lovning unallocated va faktura outstanding dan oshmasin.
+- `GET /payments/{id}/unallocated-amount` — qolgan mablag‘.
+- To‘lov/faktura `deactivate` faqat allocatsiya bo‘lmasa (ma’lumot izchiligi).
+- `app/core/money.py` — umumiy `quantize_money`.
+- Alembic: `0008_invoices_payment_allocations`.
+
+## 2026-03-21 — Qarzdorlik yoshi (aging) va mijoz statement
+
+- `/receivables`: global va mijoz bo‘yicha **aging** (ochiq fakturalar, `due_date` yoki `invoice_date`), **`GET /aging/invoices`** tafsilot.
+- **Statement**: faktura (debit) va to‘lov (kredit); allocatsiya — faqat izoh (0 summa), running balance ikki posting turiga asoslangan.
+- Yordamchilar: `receivable_helpers` (`overdue_days`, `aging_bucket`).
+
 ## 2026-03-21 — Hisobot va izohlar
 
 - JWT bo‘yicha faqat `user_id`, `company_id`, `exp` qoldirildi; `app/core/security.py` modul izohi moslashtirildi.
@@ -110,5 +153,10 @@ Bu fayl loyihada bajarilgan asosiy ishlarni va qararlarni yozib borish uchun. **
 | 2026-03-21 | Hisobot: JWT/seed matnlari, termin «omborlar» |
 | 2026-03-21 | Sales orders + migratsiya 0004 |
 | 2026-03-21 | Sales orders WMS tayyorligi + migratsiya 0005 |
+| 2026-03-21 | Integration jobs + WMS metadata + callback API + 0006 |
+| 2026-03-21 | WMS outbound worker + mock/HTTP adapter + scripts/run_worker.py |
+| 2026-03-21 | Manual payments + receivable summaries + migratsiya 0007 |
+| 2026-03-21 | Invoices + payment allocations (AR) + migratsiya 0008 |
+| 2026-03-21 | Receivable aging + client statement (`/receivables`) |
 
 *Yangi qatorlarni yuqoriga yoki shu jadvalga qo‘shing.*

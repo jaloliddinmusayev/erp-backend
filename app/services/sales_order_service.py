@@ -10,7 +10,13 @@ from app.core.exceptions import BusinessRuleError, ConflictError, NotFoundError
 from app.models.branch import Branch
 from app.models.client import Client
 from app.models.product import Product
-from app.models.sales_order import FulfillmentStatus, SalesOrder, SalesOrderItem, SalesOrderStatus
+from app.models.sales_order import (
+    FulfillmentStatus,
+    IntegrationStatus,
+    SalesOrder,
+    SalesOrderItem,
+    SalesOrderStatus,
+)
 from app.schemas.sales_order import (
     SalesOrderCreate,
     SalesOrderFulfillmentUpdate,
@@ -45,6 +51,25 @@ def _recalculate_fulfillment_status(order: SalesOrder, items: list[SalesOrderIte
         order.fulfillment_status = FulfillmentStatus.fulfilled
     else:
         order.fulfillment_status = FulfillmentStatus.partial
+
+
+def apply_fulfillment_updates_to_order(order: SalesOrder, payload: SalesOrderFulfillmentUpdate) -> None:
+    """Apply line fulfilled_qty; recalculates header fulfillment_status. No commit."""
+    by_id = {it.id: it for it in order.items}
+    seen: set[int] = set()
+    for line in payload.lines:
+        if line.item_id in seen:
+            raise BusinessRuleError("Duplicate item_id in fulfillment payload.")
+        seen.add(line.item_id)
+        item = by_id.get(line.item_id)
+        if item is None:
+            raise NotFoundError("Sales order line not found.")
+        fq = _quantize_money(line.fulfilled_qty)
+        oq = _quantize_money(item.ordered_qty)
+        if fq > oq:
+            raise BusinessRuleError("Fulfilled quantity cannot exceed ordered quantity.")
+        item.fulfilled_qty = fq
+    _recalculate_fulfillment_status(order)
 
 
 def _assert_all_lines_fully_fulfilled(order: SalesOrder) -> None:
@@ -161,6 +186,10 @@ def create_sales_order(db: Session, company_id: int, payload: SalesOrderCreate) 
         fulfillment_status=FulfillmentStatus.pending,
         fulfilled_at=None,
         is_sent_to_wms=False,
+        wms_order_id=None,
+        integration_status=IntegrationStatus.not_sent,
+        sent_to_wms_at=None,
+        last_sync_error=None,
         notes=payload.notes,
         total_amount=Decimal("0"),
         is_active=True,
@@ -187,6 +216,7 @@ def list_sales_orders(
     limit: int = 100,
     status: SalesOrderStatus | None = None,
     fulfillment_status: FulfillmentStatus | None = None,
+    integration_status: IntegrationStatus | None = None,
     client_id: int | None = None,
     date_from: date | None = None,
     date_to: date | None = None,
@@ -202,6 +232,8 @@ def list_sales_orders(
         stmt = stmt.where(SalesOrder.status == status)
     if fulfillment_status is not None:
         stmt = stmt.where(SalesOrder.fulfillment_status == fulfillment_status)
+    if integration_status is not None:
+        stmt = stmt.where(SalesOrder.integration_status == integration_status)
     if client_id is not None:
         stmt = stmt.where(SalesOrder.client_id == client_id)
     if date_from is not None:
@@ -278,18 +310,11 @@ def cancel_sales_order(db: Session, company_id: int, order_id: int) -> SalesOrde
 
 
 def send_sales_order_to_wms(db: Session, company_id: int, order_id: int) -> SalesOrder:
-    order = _get_sales_order_detail(db, company_id, order_id)
-    if not order.is_active:
-        raise BusinessRuleError("Sales order is inactive.")
-    if order.status == SalesOrderStatus.cancelled:
-        raise BusinessRuleError("Cannot send a cancelled order to WMS.")
-    if order.status != SalesOrderStatus.confirmed:
-        raise BusinessRuleError("Only confirmed sales orders can be sent to WMS.")
-    order.status = SalesOrderStatus.sent_to_wms
-    order.is_sent_to_wms = True
-    db.commit()
-    # Future: enqueue / call WMS outbound client (see app.integration.wms).
-    return _get_sales_order_detail(db, company_id, order_id)
+    """Legacy path name: enqueues an outbound WMS job (order stays confirmed until job is marked sent)."""
+    from app.services import integration_service
+
+    order, _ = integration_service.enqueue_sales_order_for_wms(db, company_id, order_id)
+    return order
 
 
 def mark_sales_order_in_progress(db: Session, company_id: int, order_id: int) -> SalesOrder:
@@ -319,22 +344,7 @@ def update_sales_order_fulfillment(
     if order.status != SalesOrderStatus.in_progress:
         raise BusinessRuleError("Fulfillment can only be updated while the order is in progress.")
 
-    by_id = {it.id: it for it in order.items}
-    seen: set[int] = set()
-    for line in payload.lines:
-        if line.item_id in seen:
-            raise BusinessRuleError("Duplicate item_id in fulfillment payload.")
-        seen.add(line.item_id)
-        item = by_id.get(line.item_id)
-        if item is None:
-            raise NotFoundError("Sales order line not found.")
-        fq = _quantize_money(line.fulfilled_qty)
-        oq = _quantize_money(item.ordered_qty)
-        if fq > oq:
-            raise BusinessRuleError("Fulfilled quantity cannot exceed ordered quantity.")
-        item.fulfilled_qty = fq
-
-    _recalculate_fulfillment_status(order)
+    apply_fulfillment_updates_to_order(order, payload)
     db.commit()
     return _get_sales_order_detail(db, company_id, order_id)
 

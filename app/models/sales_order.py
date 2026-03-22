@@ -12,6 +12,8 @@ if TYPE_CHECKING:
     from app.models.branch import Branch
     from app.models.client import Client
     from app.models.company import Company
+    from app.models.invoice import Invoice
+    from app.models.payment import Payment
     from app.models.product import Product
 
 
@@ -30,6 +32,16 @@ class FulfillmentStatus(str, enum.Enum):
     pending = "pending"
     partial = "partial"
     fulfilled = "fulfilled"
+
+
+class IntegrationStatus(str, enum.Enum):
+    """ERP ↔ WMS outbound sync state (separate from order operational status)."""
+
+    not_sent = "not_sent"
+    pending = "pending"
+    sent = "sent"
+    acknowledged = "acknowledged"
+    failed = "failed"
 
 
 class SalesOrder(Base):
@@ -62,6 +74,16 @@ class SalesOrder(Base):
     )
     fulfilled_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
     is_sent_to_wms: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False, server_default="false")
+    wms_order_id: Mapped[str | None] = mapped_column(String(128), nullable=True, index=True)
+    integration_status: Mapped[IntegrationStatus] = mapped_column(
+        SQLEnum(IntegrationStatus, values_callable=lambda x: [e.value for e in x], native_enum=False),
+        nullable=False,
+        default=IntegrationStatus.not_sent,
+        server_default=IntegrationStatus.not_sent.value,
+        index=True,
+    )
+    sent_to_wms_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    last_sync_error: Mapped[str | None] = mapped_column(Text, nullable=True)
     notes: Mapped[str | None] = mapped_column(Text, nullable=True)
     total_amount: Mapped[Decimal] = mapped_column(Numeric(18, 4), nullable=False, default=Decimal("0"))
     is_active: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True, server_default="true")
@@ -84,6 +106,8 @@ class SalesOrder(Base):
         back_populates="sales_order",
         cascade="all, delete-orphan",
     )
+    payments: Mapped[list["Payment"]] = relationship(back_populates="sales_order")
+    invoices: Mapped[list["Invoice"]] = relationship(back_populates="sales_order")
 
 
 class SalesOrderItem(Base):

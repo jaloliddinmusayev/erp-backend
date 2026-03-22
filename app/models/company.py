@@ -12,6 +12,9 @@ if TYPE_CHECKING:
     from app.models.branch import Branch
     from app.models.category import Category
     from app.models.client import Client
+    from app.models.integration_job import IntegrationJob
+    from app.models.invoice import Invoice, InvoiceItem, PaymentAllocation
+    from app.models.payment import Payment
     from app.models.product import Product
     from app.models.role import Role
     from app.models.sales_order import SalesOrder, SalesOrderItem
@@ -66,6 +69,20 @@ class Company(Base):
     clients: Mapped[list["Client"]] = relationship(back_populates="company", cascade="all, delete-orphan")
     sales_orders: Mapped[list["SalesOrder"]] = relationship(back_populates="company", cascade="all, delete-orphan")
     sales_order_items: Mapped[list["SalesOrderItem"]] = relationship(
+        back_populates="company",
+        cascade="all, delete-orphan",
+    )
+    integration_jobs: Mapped[list["IntegrationJob"]] = relationship(
+        back_populates="company",
+        cascade="all, delete-orphan",
+    )
+    payments: Mapped[list["Payment"]] = relationship(back_populates="company", cascade="all, delete-orphan")
+    invoices: Mapped[list["Invoice"]] = relationship(back_populates="company", cascade="all, delete-orphan")
+    invoice_items: Mapped[list["InvoiceItem"]] = relationship(
+        back_populates="company",
+        cascade="all, delete-orphan",
+    )
+    payment_allocations: Mapped[list["PaymentAllocation"]] = relationship(
         back_populates="company",
         cascade="all, delete-orphan",
     )

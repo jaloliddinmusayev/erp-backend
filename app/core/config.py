@@ -32,6 +32,18 @@ class Settings(BaseSettings):
     # Set false if migrations run in CI/release phase only (multi-worker setups)
     run_migrations_on_startup: bool = True
 
+    # --- WMS outbound (worker + HttpWmsClient) ---
+    wms_mock_mode: bool = True
+    wms_base_url: str = ""
+    wms_api_key: str = ""
+    wms_http_timeout_seconds: float = 30.0
+
+    # --- Integration worker (scripts/run_worker.py) ---
+    integration_job_max_attempts: int = 5
+    integration_worker_batch_size: int = 10
+    integration_job_stale_processing_seconds: int = 900
+    integration_worker_loop_seconds: int = 0  # 0 = single cycle then exit; >0 = daemon loop
+
 
 @lru_cache
 def get_settings() -> Settings:

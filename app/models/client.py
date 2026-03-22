@@ -8,6 +8,8 @@ from app.core.database import Base
 
 if TYPE_CHECKING:
     from app.models.company import Company
+    from app.models.invoice import Invoice
+    from app.models.payment import Payment
     from app.models.sales_order import SalesOrder
 
 
@@ -39,3 +41,5 @@ class Client(Base):
 
     company: Mapped["Company"] = relationship(back_populates="clients")
     sales_orders: Mapped[list["SalesOrder"]] = relationship(back_populates="client")
+    payments: Mapped[list["Payment"]] = relationship(back_populates="client")
+    invoices: Mapped[list["Invoice"]] = relationship(back_populates="client")

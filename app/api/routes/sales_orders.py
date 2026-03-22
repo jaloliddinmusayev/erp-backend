@@ -5,9 +5,10 @@ from sqlalchemy.orm import Session
 
 from app.core.dependencies import get_current_user, get_db
 from app.core.exceptions import BusinessRuleError, ConflictError, NotFoundError
-from app.models.sales_order import FulfillmentStatus, SalesOrderStatus
+from app.models.sales_order import FulfillmentStatus, IntegrationStatus, SalesOrderStatus
 from app.models.user import User
 from app.schemas.sales_order import (
+    EnqueueWmsResponse,
     SalesOrderCreate,
     SalesOrderFulfillmentUpdate,
     SalesOrderListResponse,
@@ -16,7 +17,7 @@ from app.schemas.sales_order import (
     sales_order_to_list_response,
     sales_order_to_response,
 )
-from app.services import sales_order_service
+from app.services import integration_service, sales_order_service
 
 router = APIRouter(dependencies=[Depends(get_current_user)])
 
@@ -43,6 +44,8 @@ def list_sales_orders(
     skip: int = Query(0, ge=0),
     limit: int = Query(100, ge=1, le=500),
     status: SalesOrderStatus | None = Query(None),
+    fulfillment_status: FulfillmentStatus | None = Query(None),
+    integration_status: IntegrationStatus | None = Query(None),
     client_id: int | None = Query(None, ge=1),
     date_from: date | None = Query(None),
     date_to: date | None = Query(None),
@@ -56,6 +59,7 @@ def list_sales_orders(
         limit=limit,
         status=status,
         fulfillment_status=fulfillment_status,
+        integration_status=integration_status,
         client_id=client_id,
         date_from=date_from,
         date_to=date_to,
@@ -141,18 +145,44 @@ def deactivate_sales_order(
     return sales_order_to_response(row)
 
 
+@router.post("/{order_id}/enqueue-wms", response_model=EnqueueWmsResponse, status_code=status.HTTP_201_CREATED)
+def enqueue_sales_order_for_wms(
+    order_id: int,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+) -> EnqueueWmsResponse:
+    try:
+        order, job = integration_service.enqueue_sales_order_for_wms(
+            db, current_user.company_id, order_id
+        )
+    except NotFoundError as e:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, detail=e.detail) from e
+    except BusinessRuleError as e:
+        raise HTTPException(status.HTTP_400_BAD_REQUEST, detail=e.detail) from e
+    except ConflictError as e:
+        raise HTTPException(status.HTTP_409_CONFLICT, detail=e.detail) from e
+    return EnqueueWmsResponse(
+        order=sales_order_to_response(order),
+        integration_job_id=job.id,
+        job_status=job.status,
+    )
+
+
 @router.patch("/{order_id}/send-to-wms", response_model=SalesOrderResponse)
 def send_sales_order_to_wms(
     order_id: int,
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ) -> SalesOrderResponse:
+    """Same as `POST .../enqueue-wms` (creates outbox job; order stays `confirmed` until job is marked sent)."""
     try:
         row = sales_order_service.send_sales_order_to_wms(db, current_user.company_id, order_id)
     except NotFoundError as e:
         raise HTTPException(status.HTTP_404_NOT_FOUND, detail=e.detail) from e
     except BusinessRuleError as e:
         raise HTTPException(status.HTTP_400_BAD_REQUEST, detail=e.detail) from e
+    except ConflictError as e:
+        raise HTTPException(status.HTTP_409_CONFLICT, detail=e.detail) from e
     return sales_order_to_response(row)
 
 

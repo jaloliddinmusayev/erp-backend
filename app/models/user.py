@@ -8,6 +8,8 @@ from app.core.database import Base
 
 if TYPE_CHECKING:
     from app.models.company import Company
+    from app.models.invoice import Invoice, PaymentAllocation
+    from app.models.payment import Payment
     from app.models.role import Role
 
 
@@ -35,3 +37,8 @@ class User(Base):
 
     company: Mapped["Company"] = relationship(back_populates="users")
     role: Mapped["Role"] = relationship(back_populates="users")
+    payments_created: Mapped[list["Payment"]] = relationship(back_populates="created_by_user")
+    invoices_created: Mapped[list["Invoice"]] = relationship(back_populates="created_by_user")
+    payment_allocations_created: Mapped[list["PaymentAllocation"]] = relationship(
+        back_populates="created_by_user",
+    )

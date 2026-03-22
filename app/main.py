@@ -12,12 +12,18 @@ from app.api.routes import (
     categories,
     clients,
     companies,
+    integration_jobs,
+    invoices,
+    payment_allocations,
+    payments,
     products,
+    receivables,
     roles,
     sales_orders,
     units,
     users,
     warehouses,
+    wms,
 )
 from app.core.config import get_settings
 from app.core.lifecycle import run_startup_hooks
@@ -44,6 +50,16 @@ app.include_router(units.router, prefix="/units", tags=["units"])
 app.include_router(products.router, prefix="/products", tags=["products"])
 app.include_router(clients.router, prefix="/clients", tags=["clients"])
 app.include_router(sales_orders.router, prefix="/sales-orders", tags=["sales-orders"])
+app.include_router(integration_jobs.router, prefix="/integration-jobs", tags=["integration-jobs"])
+app.include_router(wms.router, prefix="/wms", tags=["wms"])
+app.include_router(payments.router, prefix="/payments", tags=["payments"])
+app.include_router(invoices.router, prefix="/invoices", tags=["invoices"])
+app.include_router(
+    payment_allocations.router,
+    prefix="/payment-allocations",
+    tags=["payment-allocations"],
+)
+app.include_router(receivables.router, prefix="/receivables", tags=["receivables"])
 
 
 @app.get("/")
