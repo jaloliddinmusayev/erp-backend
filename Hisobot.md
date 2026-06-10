@@ -14,6 +14,29 @@ Bu fayl loyihada bajarilgan asosiy ishlarni va qararlarni yozib borish uchun. **
 
 ---
 
+## 2026-06-10 — ISHLAR_HISOBOTI.md
+
+- `ISHLAR_HISOBOTI.md` — bugungi sessiya bo‘yicha to‘liq ishlar hisoboti (backend + admin panel + holat + keyingi qadamlar).
+
+## 2026-06-10 — Sessiya yakuni va ishga tushirish holati
+
+- Admin panel `npm run build` muvaffaqiyatli; 24 ta route (login + 11 modul).
+- Foydalanuvchi login muammosi: `.env` (ADMIN_*) va `scripts/seed.py` hali ishga tushirilmagan; PostgreSQL `localhost:5432` ulanmagan (backend startup xato).
+- Login: faqat seed qilingan `ADMIN_EMAIL` / `ADMIN_PASSWORD` — admin panel o‘zi foydalanuvchi yaratmaydi.
+
+## 2026-06-10 — ERP Admin Panel (Next.js 15)
+
+- `admin-panel/` — professional admin UI: Next.js 15, React 19, TypeScript, Tailwind 4, Shadcn-style UI.
+- Auth (JWT + Zustand persist), protected routes, sidebar, navbar, dark/light mode.
+- TanStack Query + Axios API client, global error handling, Sonner toast.
+- Permission-based menu (`admin` / `manager` / `viewer`), CRUD generator (`ResourceConfig`).
+- Modullar: Dashboard (6 KPI), Products, Clients, Sales Orders, Warehouses, Payments, Invoices, Receivables, Users, Roles, Settings.
+- Backend: FastAPI ga CORS qo‘shildi (`localhost:3000`) — admin panel uchun.
+
+## 2026-06-10 — Batafsil loyiha hisoboti
+
+- `LOYIHA_BATAFSIL_HISOBOT.md` — arxitektura, modellar, API, WMS, AR modullari, deploy va roadmap bo‘yicha to‘liq hujjat.
+
 ## 2026-03-21 — Asosiy fondatsiya
 
 - FastAPI ilova: kompaniyalar, rollar, foydalanuvchilar, filiallar, omborlar.
@@ -158,5 +181,8 @@ Bu fayl loyihada bajarilgan asosiy ishlarni va qararlarni yozib borish uchun. **
 | 2026-03-21 | Manual payments + receivable summaries + migratsiya 0007 |
 | 2026-03-21 | Invoices + payment allocations (AR) + migratsiya 0008 |
 | 2026-03-21 | Receivable aging + client statement (`/receivables`) |
+| 2026-06-10 | `LOYIHA_BATAFSIL_HISOBOT.md` — batafsil loyiha hisoboti hujjati |
+| 2026-06-10 | `admin-panel/` — Next.js ERP Admin Panel + backend CORS |
+| 2026-06-10 | `ISHLAR_HISOBOTI.md` — bajarilgan ishlar hisoboti (MD) |
 
 *Yangi qatorlarni yuqoriga yoki shu jadvalga qo‘shing.*
