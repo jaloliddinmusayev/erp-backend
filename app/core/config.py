@@ -32,6 +32,15 @@ class Settings(BaseSettings):
     # Set false if migrations run in CI/release phase only (multi-worker setups)
     run_migrations_on_startup: bool = True
 
+    # CORS — comma-separated origins; override via CORS_ORIGINS env on the server
+    cors_origins: str = (
+        "http://localhost:3000,"
+        "http://127.0.0.1:3000,"
+        "https://erp-admin-five.vercel.app"
+    )
+    # Vercel preview deployments (e.g. erp-admin-five-git-main-user.vercel.app)
+    cors_allow_origin_regex: str = r"https://.*\.vercel\.app"
+
     # --- WMS outbound (worker + HttpWmsClient) ---
     wms_mock_mode: bool = True
     wms_base_url: str = ""
@@ -43,6 +52,10 @@ class Settings(BaseSettings):
     integration_worker_batch_size: int = 10
     integration_job_stale_processing_seconds: int = 900
     integration_worker_loop_seconds: int = 0  # 0 = single cycle then exit; >0 = daemon loop
+
+
+def parse_cors_origins(value: str) -> list[str]:
+    return [origin.strip() for origin in value.split(",") if origin.strip()]
 
 
 @lru_cache

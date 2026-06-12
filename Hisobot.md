@@ -14,6 +14,11 @@ Bu fayl loyihada bajarilgan asosiy ishlarni va qararlarni yozib borish uchun. **
 
 ---
 
+## 2026-06-10 — Production CORS (Vercel + api.triad.uz)
+
+- `app/main.py` + `app/core/config.py`: CORS endi `CORS_ORIGINS` va `CORS_ALLOW_ORIGIN_REGEX` orqali sozlanadi.
+- Production: `https://erp-admin-five.vercel.app`; Vercel preview: `https://.*\.vercel\.app` regex.
+
 ## 2026-06-10 — ISHLAR_HISOBOTI.md
 
 - `ISHLAR_HISOBOTI.md` — bugungi sessiya bo‘yicha to‘liq ishlar hisoboti (backend + admin panel + holat + keyingi qadamlar).
