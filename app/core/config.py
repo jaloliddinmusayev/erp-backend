@@ -36,10 +36,12 @@ class Settings(BaseSettings):
     cors_origins: str = (
         "http://localhost:3000,"
         "http://127.0.0.1:3000,"
-        "https://erp-admin-five.vercel.app"
+        "https://erp-admin-five.vercel.app,"
+        "https://triad.uz,"
+        "https://www.triad.uz"
     )
-    # Vercel preview deployments (e.g. erp-admin-five-git-main-user.vercel.app)
-    cors_allow_origin_regex: str = r"https://.*\.vercel\.app"
+    # Vercel preview + triad.uz custom domain (with or without www)
+    cors_allow_origin_regex: str = r"https://(www\.)?triad\.uz|https://.*\.vercel\.app"
 
     # --- WMS outbound (worker + HttpWmsClient) ---
     wms_mock_mode: bool = True

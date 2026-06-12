@@ -14,6 +14,10 @@ Bu fayl loyihada bajarilgan asosiy ishlarni va qararlarni yozib borish uchun. **
 
 ---
 
+## 2026-06-12 — CORS: triad.uz custom domain
+
+- Login `www.triad.uz` dan bloklangan edi — `CORS_ORIGINS` ga `https://triad.uz` va `https://www.triad.uz` qo'shildi; regex yangilandi.
+
 ## 2026-06-12 — Mijoz moduli kengaytirildi (Standart B2B)
 
 - Backend: `ClientType`, INN/STIR/PINFL, yuridik nom, viloyat/shahar/tuman, geolokatsiya (lat/lng), bank rekvizitlari; migratsiya `0009`; Pydantic validatsiya va kengaytirilgan qidiruv.

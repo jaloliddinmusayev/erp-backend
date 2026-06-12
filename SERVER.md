@@ -50,6 +50,24 @@ Bitta qator:
 cd /var/www/erp-backend && git pull origin main && sudo systemctl restart erp-backend && sudo systemctl status erp-backend --no-pager
 ```
 
+**Eslatma:** `alembic` global emas — `.venv` ichida. Qo'lda migratsiya:
+
+```bash
+cd /var/www/erp-backend
+git pull origin main
+source .venv/bin/activate
+alembic upgrade head
+sudo systemctl restart erp-backend
+```
+
+Yoki venv aktivatsiyasiz:
+
+```bash
+cd /var/www/erp-backend && git pull origin main && .venv/bin/alembic upgrade head && sudo systemctl restart erp-backend
+```
+
+`RUN_MIGRATIONS_ON_STARTUP=true` (default) bo'lsa, `restart` o'zi `upgrade head` qiladi — lekin avval `git pull` shart (yangi `alembic/versions/*.py` serverda bo'lishi kerak).
+
 ---
 
 ## Tekshiruv buyruqlari
@@ -68,7 +86,15 @@ curl -s https://api.triad.uz/health
 # {"status":"ok"}
 ```
 
-### CORS (Vercel login uchun)
+### CORS (login uchun)
+
+```bash
+curl -i -X OPTIONS "https://api.triad.uz/auth/login" \
+  -H "Origin: https://www.triad.uz" \
+  -H "Access-Control-Request-Method: POST"
+```
+
+Vercel uchun ham tekshiring:
 
 ```bash
 curl -i -X OPTIONS "https://api.triad.uz/auth/login" \
@@ -97,8 +123,8 @@ systemctl status erp-backend
 `.env` yoki default (`app/core/config.py`):
 
 ```env
-CORS_ORIGINS=http://localhost:3000,http://127.0.0.1:3000,https://erp-admin-five.vercel.app
-CORS_ALLOW_ORIGIN_REGEX=https://.*\.vercel\.app
+CORS_ORIGINS=http://localhost:3000,http://127.0.0.1:3000,https://erp-admin-five.vercel.app,https://triad.uz,https://www.triad.uz
+CORS_ALLOW_ORIGIN_REGEX=https://(www\.)?triad\.uz|https://.*\.vercel\.app
 ```
 
 O'zgartirgandan keyin: `sudo systemctl restart erp-backend`
