@@ -18,24 +18,24 @@ export default function NewProductPage() {
   });
 
   const fields = (): FormFieldConfig<ProductCreateForm>[] => [
-    { name: "code", label: "Kod", required: true },
-    { name: "name", label: "Nom", required: true },
+    { name: "code", label: "fields.code", required: true },
+    { name: "name", label: "fields.name", required: true },
     {
       name: "category_id",
-      label: "Kategoriya",
+      label: "fields.category",
       type: "select",
       required: true,
       options: categories.map((c) => ({ label: c.name, value: String(c.id) })),
     },
     {
       name: "base_unit_id",
-      label: "Birlik",
+      label: "fields.unit",
       type: "select",
       required: true,
       options: units.map((u) => ({ label: u.name, value: String(u.id) })),
     },
-    { name: "barcode", label: "Barcode" },
-    { name: "description", label: "Tavsif", type: "textarea" },
+    { name: "barcode", label: "fields.barcode" },
+    { name: "description", label: "fields.description", type: "textarea" },
   ];
 
   return (

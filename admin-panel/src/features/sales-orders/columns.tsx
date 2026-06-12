@@ -7,27 +7,28 @@ import { StatusBadge } from "@/components/shared/status-badge";
 import { formatMoney, formatDate } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Eye, Pencil } from "lucide-react";
+import { T } from "@/lib/i18n";
 
 export const salesOrderColumns: ColumnDef<SalesOrder, unknown>[] = [
-  { accessorKey: "order_number", header: "Raqam" },
+  { accessorKey: "order_number", header: () => <T k="fields.number" /> },
   {
     accessorKey: "client.name",
-    header: "Mijoz",
+    header: () => <T k="fields.client" />,
     cell: ({ row }) => row.original.client?.name ?? "—",
   },
   {
     accessorKey: "order_date",
-    header: "Sana",
+    header: () => <T k="fields.date" />,
     cell: ({ row }) => formatDate(row.original.order_date),
   },
   {
     accessorKey: "status",
-    header: "Holat",
+    header: () => <T k="fields.status" />,
     cell: ({ row }) => <StatusBadge status={row.original.status} />,
   },
   {
     accessorKey: "total_amount",
-    header: "Summa",
+    header: () => <T k="fields.amount" />,
     cell: ({ row }) => formatMoney(row.original.total_amount),
   },
   {

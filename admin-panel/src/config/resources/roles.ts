@@ -5,8 +5,8 @@ import type { Role } from "@/types/api";
 
 export const rolesResource: ResourceConfig<Role> = {
   key: "roles",
-  label: "Roles",
-  labelSingular: "Role",
+  labelKey: "modules.roles",
+  labelSingularKey: "modules.role",
   basePath: "/roles",
   permissions: { read: "roles:read", write: "roles:write" },
   list: rolesApi.listRoles,

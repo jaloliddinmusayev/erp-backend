@@ -6,23 +6,24 @@ import type { Product } from "@/types/api";
 import { StatusBadge } from "@/components/shared/status-badge";
 import { Button } from "@/components/ui/button";
 import { Eye, Pencil } from "lucide-react";
+import { T } from "@/lib/i18n";
 
 export const productColumns: ColumnDef<Product, unknown>[] = [
-  { accessorKey: "code", header: "Kod" },
-  { accessorKey: "name", header: "Nom" },
+  { accessorKey: "code", header: () => <T k="fields.code" /> },
+  { accessorKey: "name", header: () => <T k="fields.name" /> },
   {
     accessorKey: "category.name",
-    header: "Kategoriya",
+    header: () => <T k="fields.category" />,
     cell: ({ row }) => row.original.category?.name ?? "—",
   },
   {
     accessorKey: "base_unit.name",
-    header: "Birlik",
+    header: () => <T k="fields.unit" />,
     cell: ({ row }) => row.original.base_unit?.name ?? "—",
   },
   {
     accessorKey: "is_active",
-    header: "Holat",
+    header: () => <T k="fields.status" />,
     cell: ({ row }) => (
       <StatusBadge status={row.original.is_active ? "active" : "inactive"} />
     ),

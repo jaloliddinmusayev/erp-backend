@@ -27,9 +27,11 @@ import {
   salesOrderCreateSchema,
   type SalesOrderCreateForm,
 } from "@/features/sales-orders/schemas";
+import { useT } from "@/lib/i18n";
 
 export default function NewSalesOrderPage() {
   const router = useRouter();
+  const t = useT();
   const { data: clients = [] } = useQuery({
     queryKey: ["clients"],
     queryFn: () => listClients({ skip: 0, limit: 200, is_active: true }),
@@ -60,7 +62,7 @@ export default function NewSalesOrderPage() {
   const mutation = useMutation({
     mutationFn: createSalesOrder,
     onSuccess: (data) => {
-      toast.success("Buyurtma yaratildi");
+      toast.success(t("toast.orderCreated"));
       router.push(`/sales-orders/${data.id}`);
     },
     onError: onMutationError,
@@ -69,41 +71,41 @@ export default function NewSalesOrderPage() {
   return (
     <div className="space-y-6">
       <PageHeader
-        title="Yangi Sales Order"
+        title={t("common.newTitle", { name: t("modules.salesOrder") })}
         breadcrumbs={[
-          { label: "Sales Orders", href: "/sales-orders" },
-          { label: "Yangi" },
+          { label: t("modules.salesOrders"), href: "/sales-orders" },
+          { label: t("common.new") },
         ]}
       />
       <form onSubmit={handleSubmit((d) => mutation.mutate(d as never))}>
         <Card className="mb-6">
-          <CardHeader><CardTitle>Asosiy</CardTitle></CardHeader>
+          <CardHeader><CardTitle>{t("salesOrder.mainInfo")}</CardTitle></CardHeader>
           <CardContent className="grid gap-4 sm:grid-cols-2">
             <div>
-              <Label>Mijoz *</Label>
+              <Label>{t("fields.client")} *</Label>
               <Select
                 value={clientId ? String(clientId) : undefined}
                 onValueChange={(v) => setValue("client_id", Number(v))}
               >
-                <SelectTrigger className="mt-1.5"><SelectValue placeholder="Tanlang" /></SelectTrigger>
+                <SelectTrigger className="mt-1.5"><SelectValue placeholder={t("common.select")} /></SelectTrigger>
                 <SelectContent>
                   {clients.map((c) => (
                     <SelectItem key={c.id} value={String(c.id)}>{c.name}</SelectItem>
                   ))}
                 </SelectContent>
               </Select>
-              {errors.client_id && <p className="text-sm text-destructive">{errors.client_id.message}</p>}
+              {errors.client_id && <p className="text-sm text-destructive">{t(errors.client_id.message ?? "")}</p>}
             </div>
             <div>
-              <Label>Raqam *</Label>
+              <Label>{t("fields.number")} *</Label>
               <Input className="mt-1.5" {...register("order_number")} />
             </div>
             <div>
-              <Label>Sana *</Label>
+              <Label>{t("fields.date")} *</Label>
               <Input type="date" className="mt-1.5" {...register("order_date")} />
             </div>
             <div className="sm:col-span-2">
-              <Label>Izoh</Label>
+              <Label>{t("fields.notes")}</Label>
               <Textarea className="mt-1.5" {...register("notes")} />
             </div>
           </CardContent>
@@ -111,18 +113,18 @@ export default function NewSalesOrderPage() {
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between">
-            <CardTitle>Qatorlar</CardTitle>
+            <CardTitle>{t("salesOrder.lines")}</CardTitle>
             <Button type="button" variant="outline" size="sm" onClick={() => append({ product_id: 0, ordered_qty: 1, unit_price: 0 })}>
-              <Plus className="mr-1 h-4 w-4" /> Qator
+              <Plus className="mr-1 h-4 w-4" /> {t("salesOrder.addLine")}
             </Button>
           </CardHeader>
           <CardContent className="space-y-4">
             {fields.map((field, index) => (
               <div key={field.id} className="grid gap-3 rounded-lg border p-4 sm:grid-cols-4">
                 <div>
-                  <Label>Mahsulot</Label>
+                  <Label>{t("fields.product")}</Label>
                   <Select onValueChange={(v) => setValue(`items.${index}.product_id`, Number(v))}>
-                    <SelectTrigger className="mt-1"><SelectValue placeholder="Tanlang" /></SelectTrigger>
+                    <SelectTrigger className="mt-1"><SelectValue placeholder={t("common.select")} /></SelectTrigger>
                     <SelectContent>
                       {products.map((p) => (
                         <SelectItem key={p.id} value={String(p.id)}>{p.name}</SelectItem>
@@ -131,11 +133,11 @@ export default function NewSalesOrderPage() {
                   </Select>
                 </div>
                 <div>
-                  <Label>Miqdor</Label>
+                  <Label>{t("fields.quantity")}</Label>
                   <Input type="number" step="0.01" className="mt-1" {...register(`items.${index}.ordered_qty`, { valueAsNumber: true })} />
                 </div>
                 <div>
-                  <Label>Narx</Label>
+                  <Label>{t("fields.price")}</Label>
                   <Input type="number" step="0.01" className="mt-1" {...register(`items.${index}.unit_price`, { valueAsNumber: true })} />
                 </div>
                 <div className="flex items-end">
@@ -145,12 +147,12 @@ export default function NewSalesOrderPage() {
                 </div>
               </div>
             ))}
-            {errors.items && <p className="text-sm text-destructive">{errors.items.message}</p>}
+            {errors.items && <p className="text-sm text-destructive">{t(errors.items.message ?? "")}</p>}
           </CardContent>
         </Card>
 
         <Button type="submit" className="mt-6" disabled={mutation.isPending}>
-          {mutation.isPending ? "Saqlanmoqda..." : "Yaratish"}
+          {mutation.isPending ? t("common.saving") : t("common.create")}
         </Button>
       </form>
     </div>

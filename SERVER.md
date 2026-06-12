@@ -157,8 +157,12 @@ sudo systemctl restart erp-backend
 
 ### Login ishlamasa (CORS emas)
 
-1. Seed: `python scripts/seed.py` (`.env` da `ADMIN_EMAIL`, `ADMIN_PASSWORD`)
-2. DB: PostgreSQL ishlayaptimi — `systemctl status postgresql`
+1. `.env` dagi parol DB dagi parol bilan mos kelmasligi mumkin (seed boshqa parol bilan ishlagan).
+2. Tekshirish: `grep ADMIN_ /var/www/erp-backend/.env`
+3. Foydalanuvchi yo'q bo'lsa: `python scripts/seed.py`
+4. Parolni `.env` ga mos qilish: `python scripts/reset_admin_password.py`
+
+Default `.env.example` paroli (`change-me-strong-password`) production da **ishlamasligi** mumkin.
 
 ---
 

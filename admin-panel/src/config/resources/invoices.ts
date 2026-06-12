@@ -5,8 +5,8 @@ import type { Invoice } from "@/types/api";
 
 export const invoicesResource: ResourceConfig<Invoice> = {
   key: "invoices",
-  label: "Invoices",
-  labelSingular: "Invoice",
+  labelKey: "modules.invoices",
+  labelSingularKey: "modules.invoice",
   basePath: "/invoices",
   permissions: { read: "invoices:read", write: "invoices:write" },
   list: invoicesApi.listInvoices,

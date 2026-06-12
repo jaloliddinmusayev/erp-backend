@@ -1,10 +1,10 @@
 import { z } from "zod";
 
 export const productCreateSchema = z.object({
-  name: z.string().min(1, "Nom talab qilinadi"),
-  code: z.string().min(1, "Kod talab qilinadi"),
-  category_id: z.number().min(1, "Kategoriya tanlang"),
-  base_unit_id: z.number().min(1, "Birlik tanlang"),
+  name: z.string().min(1, "validation.nameRequired"),
+  code: z.string().min(1, "validation.codeRequired"),
+  category_id: z.number().min(1, "validation.categoryRequired"),
+  base_unit_id: z.number().min(1, "validation.unitRequired"),
   barcode: z.string().optional(),
   description: z.string().optional(),
 });

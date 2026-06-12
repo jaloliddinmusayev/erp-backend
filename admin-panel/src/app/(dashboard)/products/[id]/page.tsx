@@ -19,14 +19,14 @@ export default function ProductDetailPage({
       config={productsResource}
       id={numId}
       getFields={(p: Product) => [
-        { label: "Kod", value: p.code },
-        { label: "Nom", value: p.name },
-        { label: "Kategoriya", value: p.category?.name },
-        { label: "Birlik", value: p.base_unit?.name },
-        { label: "Barcode", value: p.barcode ?? "—" },
-        { label: "Tavsif", value: p.description ?? "—" },
+        { label: "fields.code", value: p.code },
+        { label: "fields.name", value: p.name },
+        { label: "fields.category", value: p.category?.name },
+        { label: "fields.unit", value: p.base_unit?.name },
+        { label: "fields.barcode", value: p.barcode ?? "—" },
+        { label: "fields.description", value: p.description ?? "—" },
         {
-          label: "Holat",
+          label: "fields.status",
           value: <StatusBadge status={p.is_active ? "active" : "inactive"} />,
         },
       ]}

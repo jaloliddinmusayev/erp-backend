@@ -5,8 +5,8 @@ import type { SalesOrder } from "@/types/api";
 
 export const salesOrdersResource: ResourceConfig<SalesOrder> = {
   key: "sales-orders",
-  label: "Sales Orders",
-  labelSingular: "Sales Order",
+  labelKey: "modules.salesOrders",
+  labelSingularKey: "modules.salesOrder",
   basePath: "/sales-orders",
   permissions: { read: "sales_orders:read", write: "sales_orders:write" },
   list: salesOrdersApi.listSalesOrders,

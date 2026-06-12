@@ -8,6 +8,7 @@ import { hasPermission } from "@/config/permissions";
 import { useAuthStore } from "@/stores/auth-store";
 import { useUiStore } from "@/stores/ui-store";
 import { cn } from "@/lib/utils";
+import { useT } from "@/lib/i18n";
 
 interface SidebarProps {
   onNavigate?: () => void;
@@ -15,6 +16,7 @@ interface SidebarProps {
 
 export function Sidebar({ onNavigate }: SidebarProps) {
   const pathname = usePathname();
+  const t = useT();
   const roleCode = useAuthStore((s) => s.user?.role.code ?? "viewer");
   const collapsed = useUiStore((s) => s.sidebarCollapsed);
   const items = filterNavigation(roleCode, hasPermission);
@@ -58,10 +60,10 @@ export function Sidebar({ onNavigate }: SidebarProps) {
                   : "text-muted-foreground hover:bg-accent hover:text-accent-foreground",
                 collapsed && "justify-center px-2",
               )}
-              title={collapsed ? item.title : undefined}
+              title={collapsed ? t(item.titleKey) : undefined}
             >
               <Icon className="h-5 w-5 shrink-0" />
-              {!collapsed && <span>{item.title}</span>}
+              {!collapsed && <span>{t(item.titleKey)}</span>}
             </Link>
           );
         })}

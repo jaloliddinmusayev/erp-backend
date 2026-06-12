@@ -3,11 +3,12 @@ import type { ZodType } from "zod";
 import type { Permission } from "../permissions";
 import type { FormFieldConfig } from "@/components/forms/resource-form";
 import type { ListParams } from "@/lib/api/client";
+import type { MessageKey } from "@/lib/i18n/translate";
 
 export interface ResourceConfig<TList, TDetail = TList> {
   key: string;
-  label: string;
-  labelSingular: string;
+  labelKey: MessageKey;
+  labelSingularKey: MessageKey;
   basePath: string;
   permissions: { read: Permission; write: Permission };
   list: (params: ListParams) => Promise<TList[]>;

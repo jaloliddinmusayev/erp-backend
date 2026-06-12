@@ -14,6 +14,13 @@ Bu fayl loyihada bajarilgan asosiy ishlarni va qararlarni yozib borish uchun. **
 
 ---
 
+## 2026-06-12 — Admin panel 3 tilli interfeys (UZ / EN / RU)
+
+- `admin-panel/src/lib/i18n/` — yengil custom i18n: `messages/{uz,en,ru}.ts` lug'atlar, `locale-store.ts` (Zustand persist, default `uz`), `translate.ts` (`tGlobal`, `MessageKey` tip), `useT()` hook va `T` komponent.
+- `LanguageSwitcher` navbar ga (globus tugma) va Settings ga (Til select) qo'shildi; `<html lang>` locale o'zgarganda yangilanadi.
+- Barcha UI matnlar kalitlarga o'tkazildi: navigation, resource configlar (`labelKey`), 8 ta columns fayl (`<T k=...>`), DataTable, ResourceForm, CRUD sahifalar, StatusBadge (status enum tarjimasi), login, dashboard KPI, receivables, settings, toastlar va Zod validatsiya xabarlari.
+- `formatMoney`/`formatDate`/`formatDateTime` endi joriy locale (`uz-UZ`/`en-US`/`ru-RU`) bo'yicha formatlaydi. `npm run build` muvaffaqiyatli (33 route).
+
 ## 2026-06-12 — Production server hujjati (vm57620)
 
 - `SERVER.md`: `/var/www/erp-backend`, `erp-backend.service`, nginx → uvicorn:8000, deploy/tekshiruv buyruqlari.

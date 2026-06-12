@@ -7,8 +7,10 @@ import { PageHeader } from "@/components/shared/page-header";
 import { Card, CardContent } from "@/components/ui/card";
 import { StatusBadge } from "@/components/shared/status-badge";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useT } from "@/lib/i18n";
 
 export default function UserViewPage({ params }: { params: Promise<{ id: string }> }) {
+  const t = useT();
   const { id } = use(params);
   const { data, isLoading } = useQuery({
     queryKey: ["users", id],
@@ -19,15 +21,15 @@ export default function UserViewPage({ params }: { params: Promise<{ id: string 
   });
 
   if (isLoading) return <Skeleton className="h-48" />;
-  if (!data) return <p>Topilmadi</p>;
+  if (!data) return <p>{t("common.notFound")}</p>;
 
   return (
     <div className="space-y-6">
-      <PageHeader title={data.full_name} breadcrumbs={[{ label: "Users", href: "/users" }, { label: data.email }]} />
+      <PageHeader title={data.full_name} breadcrumbs={[{ label: t("modules.users"), href: "/users" }, { label: data.email }]} />
       <Card><CardContent className="grid gap-4 pt-6 sm:grid-cols-2">
-        <div><p className="text-sm text-muted-foreground">Email</p><p>{data.email}</p></div>
-        <div><p className="text-sm text-muted-foreground">Rol ID</p><p>{data.role_id}</p></div>
-        <div><p className="text-sm text-muted-foreground">Holat</p><StatusBadge status={data.is_active ? "active" : "inactive"} /></div>
+        <div><p className="text-sm text-muted-foreground">{t("fields.email")}</p><p>{data.email}</p></div>
+        <div><p className="text-sm text-muted-foreground">{t("fields.roleId")}</p><p>{data.role_id}</p></div>
+        <div><p className="text-sm text-muted-foreground">{t("fields.status")}</p><StatusBadge status={data.is_active ? "active" : "inactive"} /></div>
       </CardContent></Card>
     </div>
   );

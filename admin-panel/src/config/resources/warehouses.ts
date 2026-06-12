@@ -5,8 +5,8 @@ import type { Warehouse } from "@/types/api";
 
 export const warehousesResource: ResourceConfig<Warehouse> = {
   key: "warehouses",
-  label: "Warehouses",
-  labelSingular: "Warehouse",
+  labelKey: "modules.warehouses",
+  labelSingularKey: "modules.warehouse",
   basePath: "/warehouses",
   permissions: { read: "warehouses:read", write: "warehouses:write" },
   list: warehousesApi.listWarehouses,

@@ -5,8 +5,8 @@ import type { User } from "@/types/api";
 
 export const usersResource: ResourceConfig<User> = {
   key: "users",
-  label: "Users",
-  labelSingular: "User",
+  labelKey: "modules.users",
+  labelSingularKey: "modules.user",
   basePath: "/users",
   permissions: { read: "users:read", write: "users:write" },
   list: usersApi.listUsers,

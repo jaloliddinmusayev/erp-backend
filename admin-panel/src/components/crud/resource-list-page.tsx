@@ -10,6 +10,7 @@ import { PermissionGuard } from "@/components/crud/permission-guard";
 import { Button } from "@/components/ui/button";
 import { buildListParams } from "@/lib/api/client";
 import { handleQueryError } from "@/lib/api/errors";
+import { useT } from "@/lib/i18n";
 import type { ResourceConfig } from "@/config/resources/types";
 
 const PAGE_SIZE = 20;
@@ -19,6 +20,7 @@ interface ResourceListPageProps<T> {
 }
 
 export function ResourceListPage<T>({ config }: ResourceListPageProps<T>) {
+  const t = useT();
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState("");
 
@@ -37,14 +39,14 @@ export function ResourceListPage<T>({ config }: ResourceListPageProps<T>) {
   return (
     <div className="space-y-6">
       <PageHeader
-        title={config.label}
+        title={t(config.labelKey)}
         action={
           config.supportsCreate !== false && config.create ? (
             <PermissionGuard permission={config.permissions.write}>
               <Button asChild>
                 <Link href={`${config.basePath}/new`}>
                   <Plus className="mr-2 h-4 w-4" />
-                  Yangi {config.labelSingular}
+                  {t("common.newTitle", { name: t(config.labelSingularKey) })}
                 </Link>
               </Button>
             </PermissionGuard>
@@ -62,7 +64,7 @@ export function ResourceListPage<T>({ config }: ResourceListPageProps<T>) {
         onPageChange={setPage}
         search={config.searchKey ? search : undefined}
         onSearchChange={config.searchKey ? setSearch : undefined}
-        searchPlaceholder={`${config.label} qidirish...`}
+        searchPlaceholder={t("common.searchIn", { name: t(config.labelKey) })}
       />
     </div>
   );

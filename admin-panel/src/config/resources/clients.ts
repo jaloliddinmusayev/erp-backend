@@ -6,8 +6,8 @@ import type { Client } from "@/types/api";
 
 export const clientsResource: ResourceConfig<Client> = {
   key: "clients",
-  label: "Clients",
-  labelSingular: "Client",
+  labelKey: "modules.clients",
+  labelSingularKey: "modules.client",
   basePath: "/clients",
   permissions: { read: "clients:read", write: "clients:write" },
   list: clientsApi.listClients,

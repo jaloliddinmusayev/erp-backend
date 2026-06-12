@@ -7,8 +7,10 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { getAging } from "@/lib/api/modules/receivables";
 import { formatMoney, formatDate } from "@/lib/utils";
 import { handleQueryError } from "@/lib/api/errors";
+import { useT } from "@/lib/i18n";
 
 export default function ReceivablesPage() {
+  const t = useT();
   const { data, isLoading, isError, error } = useQuery({
     queryKey: ["receivables", "aging"],
     queryFn: () => getAging(),
@@ -19,8 +21,8 @@ export default function ReceivablesPage() {
   return (
     <div className="space-y-6">
       <PageHeader
-        title="Receivables"
-        description="Qarzdorlik yoshi (aging) — ochiq fakturalar bo'yicha"
+        title={t("nav.receivables")}
+        description={t("receivables.description")}
       />
 
       {isLoading ? (
@@ -30,7 +32,7 @@ export default function ReceivablesPage() {
           <Card>
             <CardHeader>
               <CardTitle className="text-lg">
-                Umumiy qarz — {formatDate(data?.as_of_date)}
+                {t("receivables.totalOutstanding", { date: formatDate(data?.as_of_date) })}
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -48,7 +50,9 @@ export default function ReceivablesPage() {
                 </CardHeader>
                 <CardContent>
                   <p className="text-2xl font-bold">{formatMoney(bucket.total_outstanding)}</p>
-                  <p className="text-xs text-muted-foreground">{bucket.invoice_count} ta faktura</p>
+                  <p className="text-xs text-muted-foreground">
+                    {t("receivables.invoiceCount", { count: bucket.invoice_count })}
+                  </p>
                 </CardContent>
               </Card>
             ))}

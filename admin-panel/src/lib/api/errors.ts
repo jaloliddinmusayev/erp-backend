@@ -1,5 +1,6 @@
 import { AxiosError } from "axios";
 import { toast } from "sonner";
+import { tGlobal } from "@/lib/i18n/translate";
 
 export class ApiError extends Error {
   status: number;
@@ -14,7 +15,7 @@ export class ApiError extends Error {
 }
 
 function extractDetail(data: unknown): string {
-  if (!data || typeof data !== "object") return "Noma'lum xato";
+  if (!data || typeof data !== "object") return tGlobal("errors.unknown");
   const d = data as Record<string, unknown>;
   if (typeof d.detail === "string") return d.detail;
   if (Array.isArray(d.detail)) {
@@ -27,7 +28,7 @@ function extractDetail(data: unknown): string {
       })
       .join("; ");
   }
-  return "So'rov bajarilmadi";
+  return tGlobal("errors.requestFailed");
 }
 
 export function parseAxiosError(error: unknown): ApiError {
@@ -38,7 +39,7 @@ export function parseAxiosError(error: unknown): ApiError {
     return new ApiError(status, detail);
   }
   if (error instanceof Error) return new ApiError(500, error.message);
-  return new ApiError(500, "Noma'lum xato");
+  return new ApiError(500, tGlobal("errors.unknown"));
 }
 
 export function handleMutationError(error: unknown, fallback?: string): void {

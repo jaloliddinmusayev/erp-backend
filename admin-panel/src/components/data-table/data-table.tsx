@@ -13,6 +13,7 @@ import { ChevronLeft, ChevronRight, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useT } from "@/lib/i18n";
 
 interface DataTableProps<TData> {
   columns: ColumnDef<TData, unknown>[];
@@ -37,9 +38,10 @@ export function DataTable<TData>({
   onPageChange,
   search,
   onSearchChange,
-  searchPlaceholder = "Qidirish...",
-  emptyMessage = "Ma'lumot topilmadi",
+  searchPlaceholder,
+  emptyMessage,
 }: DataTableProps<TData>) {
+  const t = useT();
   const [sorting, setSorting] = useState<SortingState>([]);
 
   const table = useReactTable({
@@ -57,7 +59,7 @@ export function DataTable<TData>({
         <div className="relative max-w-sm">
           <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
           <Input
-            placeholder={searchPlaceholder}
+            placeholder={searchPlaceholder ?? t("common.search")}
             value={search ?? ""}
             onChange={(e) => onSearchChange(e.target.value)}
             className="pl-9"
@@ -101,7 +103,7 @@ export function DataTable<TData>({
                     colSpan={columns.length}
                     className="h-24 text-center text-muted-foreground"
                   >
-                    {emptyMessage}
+                    {emptyMessage ?? t("common.noData")}
                   </td>
                 </tr>
               ) : (
@@ -125,7 +127,7 @@ export function DataTable<TData>({
 
       <div className="flex items-center justify-between">
         <p className="text-sm text-muted-foreground">
-          Sahifa {page} · {data.length} ta yozuv
+          {t("common.pageInfo", { page, count: data.length })}
         </p>
         <div className="flex gap-2">
           <Button
@@ -135,7 +137,7 @@ export function DataTable<TData>({
             disabled={page <= 1 || loading}
           >
             <ChevronLeft className="h-4 w-4" />
-            Oldingi
+            {t("common.previous")}
           </Button>
           <Button
             variant="outline"
@@ -143,7 +145,7 @@ export function DataTable<TData>({
             onClick={() => onPageChange(page + 1)}
             disabled={!hasMore || loading}
           >
-            Keyingi
+            {t("common.next")}
             <ChevronRight className="h-4 w-4" />
           </Button>
         </div>

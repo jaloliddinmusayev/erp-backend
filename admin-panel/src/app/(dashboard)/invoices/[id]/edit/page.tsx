@@ -1,8 +1,10 @@
 "use client";
 
 import { use } from "react";
+import { useT } from "@/lib/i18n";
 
 export default function EditInvoicePage({ params }: { params: Promise<{ id: string }> }) {
   use(params);
-  return <p className="text-muted-foreground">Draft fakturalarni tahrirlash — keyingi iteratsiya.</p>;
+  const t = useT();
+  return <p className="text-muted-foreground">{t("common.editNotReady")}</p>;
 }

@@ -24,22 +24,22 @@ export default function EditProductPage({
   });
 
   const fields = (): FormFieldConfig<ProductUpdateForm>[] => [
-    { name: "code", label: "Kod" },
-    { name: "name", label: "Nom" },
+    { name: "code", label: "fields.code" },
+    { name: "name", label: "fields.name" },
     {
       name: "category_id",
-      label: "Kategoriya",
+      label: "fields.category",
       type: "select",
       options: categories.map((c) => ({ label: c.name, value: String(c.id) })),
     },
     {
       name: "base_unit_id",
-      label: "Birlik",
+      label: "fields.unit",
       type: "select",
       options: units.map((u) => ({ label: u.name, value: String(u.id) })),
     },
-    { name: "barcode", label: "Barcode" },
-    { name: "description", label: "Tavsif", type: "textarea" },
+    { name: "barcode", label: "fields.barcode" },
+    { name: "description", label: "fields.description", type: "textarea" },
   ];
 
   return (

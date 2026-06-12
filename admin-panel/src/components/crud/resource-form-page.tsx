@@ -8,6 +8,7 @@ import { PageHeader } from "@/components/shared/page-header";
 import { ResourceForm } from "@/components/forms/resource-form";
 import { Skeleton } from "@/components/ui/skeleton";
 import { onMutationError } from "@/lib/api/errors";
+import { useT } from "@/lib/i18n";
 import type { FormFieldConfig } from "@/components/forms/resource-form";
 import type { ResourceConfig } from "@/config/resources/types";
 import type { FieldValues } from "react-hook-form";
@@ -27,6 +28,7 @@ export function ResourceFormPage<T>({
 }: ResourceFormPageProps<T>) {
   const router = useRouter();
   const queryClient = useQueryClient();
+  const t = useT();
 
   const { data, isLoading } = useQuery({
     queryKey: [config.key, id],
@@ -42,9 +44,9 @@ export function ResourceFormPage<T>({
     onSuccess: (result) => {
       queryClient.invalidateQueries({ queryKey: [config.key] });
       toast.success(
-        mode === "create"
-          ? `${config.labelSingular} yaratildi`
-          : `${config.labelSingular} yangilandi`,
+        t(mode === "create" ? "toast.created" : "toast.updated", {
+          name: t(config.labelSingularKey),
+        }),
       );
       const res = result as { id?: number };
       router.push(`${config.basePath}/${res.id ?? id}`);
@@ -68,19 +70,19 @@ export function ResourceFormPage<T>({
       <PageHeader
         title={
           mode === "create"
-            ? `Yangi ${config.labelSingular}`
-            : `${config.labelSingular} tahrirlash`
+            ? t("common.newTitle", { name: t(config.labelSingularKey) })
+            : t("common.editTitle", { name: t(config.labelSingularKey) })
         }
         breadcrumbs={[
-          { label: config.label, href: config.basePath },
+          { label: t(config.labelKey), href: config.basePath },
           {
-            label: mode === "create" ? "Yangi" : `#${id}`,
+            label: mode === "create" ? t("common.new") : `#${id}`,
           },
         ]}
       />
       <Card>
         <CardHeader>
-          <CardTitle className="text-lg">Ma&apos;lumotlar</CardTitle>
+          <CardTitle className="text-lg">{t("common.info")}</CardTitle>
         </CardHeader>
         <CardContent>
           <ResourceForm
@@ -93,7 +95,7 @@ export function ResourceFormPage<T>({
             }
             loading={mutation.isPending}
             onSubmit={(values) => mutation.mutate(values as Record<string, unknown>)}
-            submitLabel={mode === "create" ? "Yaratish" : "Saqlash"}
+            submitLabel={mode === "create" ? t("common.create") : t("common.save")}
           />
         </CardContent>
       </Card>

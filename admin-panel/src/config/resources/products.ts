@@ -9,8 +9,8 @@ import type { Product } from "@/types/api";
 
 export const productsResource: ResourceConfig<Product> = {
   key: "products",
-  label: "Products",
-  labelSingular: "Product",
+  labelKey: "modules.products",
+  labelSingularKey: "modules.product",
   basePath: "/products",
   permissions: { read: "products:read", write: "products:write" },
   list: productsApi.listProducts,

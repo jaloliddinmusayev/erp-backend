@@ -15,6 +15,7 @@ import {
   enqueueWms,
 } from "@/lib/api/modules/sales-orders";
 import { onMutationError } from "@/lib/api/errors";
+import { useT } from "@/lib/i18n";
 import type { SalesOrder } from "@/types/api";
 
 export default function SalesOrderDetailPage({
@@ -22,6 +23,7 @@ export default function SalesOrderDetailPage({
 }: {
   params: Promise<{ id: string }>;
 }) {
+  const t = useT();
   const { id } = use(params);
   const numId = Number(id);
   const queryClient = useQueryClient();
@@ -31,19 +33,19 @@ export default function SalesOrderDetailPage({
 
   const confirmMut = useMutation({
     mutationFn: () => confirmSalesOrder(numId),
-    onSuccess: () => { invalidate(); toast.success("Buyurtma tasdiqlandi"); },
+    onSuccess: () => { invalidate(); toast.success(t("toast.orderConfirmed")); },
     onError: onMutationError,
   });
 
   const cancelMut = useMutation({
     mutationFn: () => cancelSalesOrder(numId),
-    onSuccess: () => { invalidate(); toast.success("Buyurtma bekor qilindi"); },
+    onSuccess: () => { invalidate(); toast.success(t("toast.orderCancelled")); },
     onError: onMutationError,
   });
 
   const wmsMut = useMutation({
     mutationFn: () => enqueueWms(numId),
-    onSuccess: () => { invalidate(); toast.success("WMS navbatiga qo'shildi"); },
+    onSuccess: () => { invalidate(); toast.success(t("toast.wmsEnqueued")); },
     onError: onMutationError,
   });
 
@@ -52,27 +54,27 @@ export default function SalesOrderDetailPage({
       config={salesOrdersResource}
       id={numId}
       getFields={(o: SalesOrder) => [
-        { label: "Raqam", value: o.order_number },
-        { label: "Mijoz", value: o.client?.name },
-        { label: "Sana", value: formatDate(o.order_date) },
-        { label: "Holat", value: <StatusBadge status={o.status} /> },
-        { label: "Fulfillment", value: <StatusBadge status={o.fulfillment_status} /> },
-        { label: "Integration", value: <StatusBadge status={o.integration_status} /> },
-        { label: "Summa", value: formatMoney(o.total_amount) },
-        { label: "WMS ID", value: o.wms_order_id ?? "—" },
-        { label: "Izoh", value: o.notes ?? "—" },
+        { label: "fields.number", value: o.order_number },
+        { label: "fields.client", value: o.client?.name },
+        { label: "fields.date", value: formatDate(o.order_date) },
+        { label: "fields.status", value: <StatusBadge status={o.status} /> },
+        { label: "fields.fulfillment", value: <StatusBadge status={o.fulfillment_status} /> },
+        { label: "fields.integration", value: <StatusBadge status={o.integration_status} /> },
+        { label: "fields.amount", value: formatMoney(o.total_amount) },
+        { label: "fields.wmsId", value: o.wms_order_id ?? "—" },
+        { label: "fields.notes", value: o.notes ?? "—" },
       ]}
       actions={
         <PermissionGuard permission="sales_orders:write">
           <div className="flex flex-wrap gap-2">
             <Button size="sm" onClick={() => confirmMut.mutate(undefined)} disabled={confirmMut.isPending}>
-              Tasdiqlash
+              {t("salesOrder.confirm")}
             </Button>
             <Button size="sm" variant="outline" onClick={() => wmsMut.mutate(undefined)} disabled={wmsMut.isPending}>
-              WMS ga yuborish
+              {t("salesOrder.sendToWms")}
             </Button>
             <Button size="sm" variant="destructive" onClick={() => cancelMut.mutate(undefined)} disabled={cancelMut.isPending}>
-              Bekor qilish
+              {t("salesOrder.cancelOrder")}
             </Button>
           </div>
         </PermissionGuard>

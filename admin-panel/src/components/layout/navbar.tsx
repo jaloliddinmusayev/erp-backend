@@ -14,9 +14,12 @@ import {
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { useAuthStore } from "@/stores/auth-store";
 import { useUiStore } from "@/stores/ui-store";
+import { useT } from "@/lib/i18n";
+import { LanguageSwitcher } from "./language-switcher";
 
 export function Navbar() {
   const router = useRouter();
+  const t = useT();
   const { theme, setTheme } = useTheme();
   const user = useAuthStore((s) => s.user);
   const logout = useAuthStore((s) => s.logout);
@@ -60,6 +63,8 @@ export function Navbar() {
 
       <div className="flex-1" />
 
+      <LanguageSwitcher />
+
       <Button
         variant="ghost"
         size="icon"
@@ -89,12 +94,12 @@ export function Navbar() {
           </div>
           <DropdownMenuSeparator />
           <DropdownMenuItem onClick={() => router.push("/settings")}>
-            Sozlamalar
+            {t("common.settings")}
           </DropdownMenuItem>
           <DropdownMenuSeparator />
           <DropdownMenuItem onClick={handleLogout} className="text-destructive">
             <LogOut className="mr-2 h-4 w-4" />
-            Chiqish
+            {t("common.logout")}
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>

@@ -18,15 +18,15 @@ export default function ClientDetailPage({
       config={clientsResource}
       id={Number(id)}
       getFields={(c: Client) => [
-        { label: "Kod", value: c.code },
-        { label: "Nom", value: c.name },
-        { label: "Mas'ul", value: c.contact_person ?? "—" },
-        { label: "Telefon", value: c.phone ?? "—" },
-        { label: "Email", value: c.email ?? "—" },
-        { label: "Manzil", value: c.address ?? "—" },
-        { label: "Izoh", value: c.notes ?? "—" },
+        { label: "fields.code", value: c.code },
+        { label: "fields.name", value: c.name },
+        { label: "fields.contactPerson", value: c.contact_person ?? "—" },
+        { label: "fields.phone", value: c.phone ?? "—" },
+        { label: "fields.email", value: c.email ?? "—" },
+        { label: "fields.address", value: c.address ?? "—" },
+        { label: "fields.notes", value: c.notes ?? "—" },
         {
-          label: "Holat",
+          label: "fields.status",
           value: <StatusBadge status={c.is_active ? "active" : "inactive"} />,
         },
       ]}

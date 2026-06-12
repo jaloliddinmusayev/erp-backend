@@ -12,16 +12,18 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useAuth } from "@/hooks/use-auth";
 import { useAuthStore } from "@/stores/auth-store";
+import { useT } from "@/lib/i18n";
 
 const loginSchema = z.object({
-  email: z.string().email("To'g'ri email kiriting"),
-  password: z.string().min(1, "Parol talab qilinadi"),
+  email: z.string().email("validation.emailInvalid"),
+  password: z.string().min(1, "validation.passwordRequired"),
 });
 
 type LoginForm = z.infer<typeof loginSchema>;
 
 export default function LoginPage() {
   const router = useRouter();
+  const t = useT();
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
   const { login, loginLoading } = useAuth();
 
@@ -47,9 +49,7 @@ export default function LoginPage() {
           </div>
           <div>
             <CardTitle className="text-2xl">Core ERP Admin</CardTitle>
-            <CardDescription>
-              Tizimga kirish uchun hisobingizdan foydalaning
-            </CardDescription>
+            <CardDescription>{t("auth.subtitle")}</CardDescription>
           </div>
         </CardHeader>
         <CardContent>
@@ -59,7 +59,7 @@ export default function LoginPage() {
             noValidate
           >
             <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
+              <Label htmlFor="email">{t("fields.email")}</Label>
               <Input
                 id="email"
                 type="email"
@@ -68,11 +68,11 @@ export default function LoginPage() {
                 {...register("email")}
               />
               {errors.email && (
-                <p className="text-sm text-destructive">{errors.email.message}</p>
+                <p className="text-sm text-destructive">{t(errors.email.message ?? "")}</p>
               )}
             </div>
             <div className="space-y-2">
-              <Label htmlFor="password">Parol</Label>
+              <Label htmlFor="password">{t("fields.password")}</Label>
               <Input
                 id="password"
                 type="password"
@@ -80,17 +80,17 @@ export default function LoginPage() {
                 {...register("password")}
               />
               {errors.password && (
-                <p className="text-sm text-destructive">{errors.password.message}</p>
+                <p className="text-sm text-destructive">{t(errors.password.message ?? "")}</p>
               )}
             </div>
             <Button type="submit" className="w-full" disabled={loginLoading}>
               {loginLoading ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Kirilmoqda...
+                  {t("auth.loggingIn")}
                 </>
               ) : (
-                "Kirish"
+                t("auth.login")
               )}
             </Button>
           </form>

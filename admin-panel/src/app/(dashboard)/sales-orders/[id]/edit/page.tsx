@@ -1,6 +1,7 @@
 "use client";
 
 import { use } from "react";
+import { useT } from "@/lib/i18n";
 
 export default function EditSalesOrderPage({
   params,
@@ -8,10 +9,6 @@ export default function EditSalesOrderPage({
   params: Promise<{ id: string }>;
 }) {
   use(params);
-  return (
-    <p className="text-muted-foreground">
-      Draft buyurtmalarni tahrirlash — backend PUT /sales-orders/{`{id}`} orqali.
-      Form keyingi iteratsiyada to&apos;ldiriladi.
-    </p>
-  );
+  const t = useT();
+  return <p className="text-muted-foreground">{t("common.editNotReady")}</p>;
 }

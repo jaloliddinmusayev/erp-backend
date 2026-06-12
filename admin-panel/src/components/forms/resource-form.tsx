@@ -20,11 +20,13 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { useT } from "@/lib/i18n";
 
 export type FieldType = "text" | "email" | "number" | "date" | "textarea" | "select";
 
 export interface FormFieldConfig<T extends FieldValues> {
   name: Path<T>;
+  /** Either an i18n key (e.g. "fields.code") or raw text. */
   label: string;
   type?: FieldType;
   placeholder?: string;
@@ -49,8 +51,9 @@ export function ResourceForm<T extends FieldValues>({
   defaultValues,
   onSubmit,
   loading,
-  submitLabel = "Saqlash",
+  submitLabel,
 }: ResourceFormProps<T>) {
+  const t = useT();
   const {
     register,
     handleSubmit,
@@ -75,7 +78,7 @@ export function ResourceForm<T extends FieldValues>({
               className={field.type === "textarea" ? "sm:col-span-2" : ""}
             >
               <Label htmlFor={String(field.name)}>
-                {field.label}
+                {t(field.label)}
                 {field.required && <span className="text-destructive"> *</span>}
               </Label>
 
@@ -98,7 +101,7 @@ export function ResourceForm<T extends FieldValues>({
                   disabled={field.disabled || loading}
                 >
                   <SelectTrigger className="mt-1.5" id={String(field.name)}>
-                    <SelectValue placeholder={field.placeholder ?? "Tanlang"} />
+                    <SelectValue placeholder={field.placeholder ?? t("common.select")} />
                   </SelectTrigger>
                   <SelectContent>
                     {field.options.map((opt) => (
@@ -122,7 +125,7 @@ export function ResourceForm<T extends FieldValues>({
               )}
 
               {error && (
-                <p className="mt-1 text-sm text-destructive">{error}</p>
+                <p className="mt-1 text-sm text-destructive">{t(error)}</p>
               )}
             </div>
           );
@@ -131,7 +134,7 @@ export function ResourceForm<T extends FieldValues>({
 
       <div className="flex gap-3">
         <Button type="submit" disabled={loading}>
-          {loading ? "Saqlanmoqda..." : submitLabel}
+          {loading ? t("common.saving") : submitLabel ?? t("common.save")}
         </Button>
       </div>
     </form>

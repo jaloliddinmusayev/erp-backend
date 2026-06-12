@@ -5,8 +5,8 @@ import type { Payment } from "@/types/api";
 
 export const paymentsResource: ResourceConfig<Payment> = {
   key: "payments",
-  label: "Payments",
-  labelSingular: "Payment",
+  labelKey: "modules.payments",
+  labelSingularKey: "modules.payment",
   basePath: "/payments",
   permissions: { read: "payments:read", write: "payments:write" },
   list: paymentsApi.listPayments,

@@ -6,6 +6,17 @@ import { ThemeProvider } from "next-themes";
 import { Toaster } from "sonner";
 import { registerAuthHandlers } from "@/lib/api/client";
 import { useAuthStore } from "@/stores/auth-store";
+import { useLocaleStore } from "@/lib/i18n";
+
+function LocaleSync() {
+  const locale = useLocaleStore((s) => s.locale);
+
+  useEffect(() => {
+    document.documentElement.lang = locale;
+  }, [locale]);
+
+  return null;
+}
 
 function AuthBridge() {
   const logout = useAuthStore((s) => s.logout);
@@ -43,6 +54,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
     <QueryClientProvider client={queryClient}>
       <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
         <AuthBridge />
+        <LocaleSync />
         {children}
         <Toaster richColors position="top-right" closeButton />
       </ThemeProvider>

@@ -1,9 +1,9 @@
 import { z } from "zod";
 
 export const salesOrderCreateSchema = z.object({
-  client_id: z.number().min(1, "Mijoz tanlang"),
-  order_number: z.string().min(1, "Raqam talab qilinadi"),
-  order_date: z.string().min(1, "Sana talab qilinadi"),
+  client_id: z.number().min(1, "validation.clientRequired"),
+  order_number: z.string().min(1, "validation.numberRequired"),
+  order_date: z.string().min(1, "validation.dateRequired"),
   branch_id: z.number().optional(),
   notes: z.string().optional(),
   items: z
@@ -15,7 +15,7 @@ export const salesOrderCreateSchema = z.object({
         notes: z.string().optional(),
       }),
     )
-    .min(1, "Kamida bitta qator"),
+    .min(1, "validation.itemsRequired"),
 });
 
 export type SalesOrderCreateForm = z.infer<typeof salesOrderCreateSchema>;
