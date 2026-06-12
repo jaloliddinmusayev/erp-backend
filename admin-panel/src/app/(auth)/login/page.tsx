@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { Building2, Loader2 } from "lucide-react";
+import { Sparkles, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -41,16 +41,21 @@ export default function LoginPage() {
   }, [isAuthenticated, router]);
 
   return (
-    <div className="flex min-h-screen items-center justify-center p-4">
-      <Card className="w-full max-w-md shadow-lg">
-        <CardHeader className="space-y-4 text-center">
-          <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-primary text-primary-foreground">
-            <Building2 className="h-7 w-7" />
-          </div>
-          <div>
-            <CardTitle className="text-2xl">Core ERP Admin</CardTitle>
-            <CardDescription>{t("auth.subtitle")}</CardDescription>
-          </div>
+    <div className="flex flex-1 flex-col items-center justify-center p-6 lg:p-10">
+      <div className="mb-8 flex items-center gap-3 lg:hidden">
+        <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-gradient-to-br from-indigo-500 to-violet-600 text-white shadow-md">
+          <Sparkles className="h-6 w-6" />
+        </div>
+        <div>
+          <p className="text-lg font-bold tracking-tight">Triad ERP</p>
+          <p className="text-xs text-muted-foreground">{t("common.adminPanel")}</p>
+        </div>
+      </div>
+
+      <Card className="w-full max-w-md border-0 shadow-xl shadow-indigo-500/5 lg:border lg:shadow-lg">
+        <CardHeader className="space-y-2 pb-2">
+          <CardTitle className="text-2xl tracking-tight">{t("auth.loginTitle")}</CardTitle>
+          <CardDescription>{t("auth.subtitle")}</CardDescription>
         </CardHeader>
         <CardContent>
           <form
@@ -65,6 +70,7 @@ export default function LoginPage() {
                 type="email"
                 placeholder="admin@erp.uz"
                 autoComplete="email"
+                className="h-11"
                 {...register("email")}
               />
               {errors.email && (
@@ -77,13 +83,14 @@ export default function LoginPage() {
                 id="password"
                 type="password"
                 autoComplete="current-password"
+                className="h-11"
                 {...register("password")}
               />
               {errors.password && (
                 <p className="text-sm text-destructive">{t(errors.password.message ?? "")}</p>
               )}
             </div>
-            <Button type="submit" className="w-full" disabled={loginLoading}>
+            <Button type="submit" className="h-11 w-full" disabled={loginLoading}>
               {loginLoading ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />

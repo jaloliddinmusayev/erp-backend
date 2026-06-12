@@ -67,7 +67,8 @@ export function ResourceForm<T extends FieldValues>({
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-      <div className="grid gap-4 sm:grid-cols-2">
+      <div className="rounded-2xl border bg-card p-6 shadow-sm">
+        <div className="grid gap-4 sm:grid-cols-2">
         {fields.map((field) => {
           const error = errors[field.name]?.message as string | undefined;
           const value = watch(field.name);
@@ -130,9 +131,10 @@ export function ResourceForm<T extends FieldValues>({
             </div>
           );
         })}
+        </div>
       </div>
 
-      <div className="flex gap-3">
+      <div className="sticky bottom-0 flex gap-3 rounded-2xl border bg-card/95 p-4 shadow-sm backdrop-blur supports-[backdrop-filter]:bg-card/80">
         <Button type="submit" disabled={loading}>
           {loading ? t("common.saving") : submitLabel ?? t("common.save")}
         </Button>

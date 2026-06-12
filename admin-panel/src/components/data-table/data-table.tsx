@@ -9,10 +9,11 @@ import {
   type SortingState,
 } from "@tanstack/react-table";
 import { useState } from "react";
-import { ChevronLeft, ChevronRight, Search } from "lucide-react";
+import { ChevronLeft, ChevronRight, Inbox, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
+import { EmptyState } from "@/components/shared/empty-state";
 import { useT } from "@/lib/i18n";
 
 interface DataTableProps<TData> {
@@ -27,6 +28,7 @@ interface DataTableProps<TData> {
   onSearchChange?: (value: string) => void;
   searchPlaceholder?: string;
   emptyMessage?: string;
+  emptyDescription?: string;
 }
 
 export function DataTable<TData>({
@@ -40,6 +42,7 @@ export function DataTable<TData>({
   onSearchChange,
   searchPlaceholder,
   emptyMessage,
+  emptyDescription,
 }: DataTableProps<TData>) {
   const t = useT();
   const [sorting, setSorting] = useState<SortingState>([]);
@@ -67,16 +70,16 @@ export function DataTable<TData>({
         </div>
       )}
 
-      <div className="rounded-xl border bg-card">
+      <div className="overflow-hidden rounded-2xl border bg-card shadow-sm">
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
               {table.getHeaderGroups().map((hg) => (
-                <tr key={hg.id} className="border-b bg-muted/50">
+                <tr key={hg.id} className="border-b bg-muted/30">
                   {hg.headers.map((header) => (
                     <th
                       key={header.id}
-                      className="h-11 px-4 text-left align-middle font-medium text-muted-foreground"
+                      className="h-11 px-4 text-left align-middle text-xs font-semibold uppercase tracking-wide text-muted-foreground"
                     >
                       {header.isPlaceholder
                         ? null
@@ -99,18 +102,19 @@ export function DataTable<TData>({
                 ))
               ) : data.length === 0 ? (
                 <tr>
-                  <td
-                    colSpan={columns.length}
-                    className="h-24 text-center text-muted-foreground"
-                  >
-                    {emptyMessage ?? t("common.noData")}
+                  <td colSpan={columns.length}>
+                    <EmptyState
+                      icon={Inbox}
+                      title={emptyMessage ?? t("common.noData")}
+                      description={emptyDescription ?? t("common.emptyStateDesc")}
+                    />
                   </td>
                 </tr>
               ) : (
                 table.getRowModel().rows.map((row) => (
                   <tr
                     key={row.id}
-                    className="border-b transition-colors hover:bg-muted/50"
+                    className="border-b transition-colors last:border-0 hover:bg-muted/40"
                   >
                     {row.getVisibleCells().map((cell) => (
                       <td key={cell.id} className="p-4 align-middle">
@@ -126,13 +130,14 @@ export function DataTable<TData>({
       </div>
 
       <div className="flex items-center justify-between">
-        <p className="text-sm text-muted-foreground">
+        <span className="inline-flex items-center rounded-full bg-muted px-3 py-1 text-xs font-medium text-muted-foreground">
           {t("common.pageInfo", { page, count: data.length })}
-        </p>
+        </span>
         <div className="flex gap-2">
           <Button
             variant="outline"
             size="sm"
+            className="rounded-lg"
             onClick={() => onPageChange(page - 1)}
             disabled={page <= 1 || loading}
           >
@@ -142,6 +147,7 @@ export function DataTable<TData>({
           <Button
             variant="outline"
             size="sm"
+            className="rounded-lg"
             onClick={() => onPageChange(page + 1)}
             disabled={!hasMore || loading}
           >

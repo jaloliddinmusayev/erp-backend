@@ -72,22 +72,29 @@ export function ResourceDetailPage<T>({
         }
       />
 
-      <Card>
+      <Card className="shadow-sm">
         <CardHeader>
           <CardTitle className="text-lg">{t("common.details")}</CardTitle>
         </CardHeader>
         <CardContent>
           <dl className="grid gap-4 sm:grid-cols-2">
             {fields.map((f) => (
-              <div key={f.label}>
-                <dt className="text-sm text-muted-foreground">{t(f.label)}</dt>
-                <dd className="mt-1 font-medium">{f.value}</dd>
+              <div
+                key={f.label}
+                className="rounded-xl border border-border/60 bg-muted/20 p-4"
+              >
+                <dt className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                  {t(f.label)}
+                </dt>
+                <dd className="mt-1.5 font-medium">{f.value}</dd>
               </div>
             ))}
             {item.created_at && (
-              <div>
-                <dt className="text-sm text-muted-foreground">{t("common.createdAt")}</dt>
-                <dd className="mt-1 font-medium">
+              <div className="rounded-xl border border-border/60 bg-muted/20 p-4">
+                <dt className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                  {t("common.createdAt")}
+                </dt>
+                <dd className="mt-1.5 font-medium">
                   {formatDateTime(item.created_at)}
                 </dd>
               </div>

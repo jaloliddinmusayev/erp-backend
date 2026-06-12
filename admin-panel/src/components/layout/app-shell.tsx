@@ -11,7 +11,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
   return (
     <AuthGuard>
-      <div className="flex min-h-screen bg-background">
+      <div className="flex min-h-screen bg-page-gradient">
         <div className="hidden md:block">
           <Sidebar />
         </div>
@@ -24,7 +24,9 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
         <div className="flex min-w-0 flex-1 flex-col">
           <Navbar />
-          <main className="flex-1 overflow-auto p-4 lg:p-6">{children}</main>
+          <main className="mx-auto w-full max-w-7xl flex-1 overflow-auto p-4 lg:p-8">
+            {children}
+          </main>
         </div>
       </div>
     </AuthGuard>

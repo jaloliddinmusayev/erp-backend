@@ -38,7 +38,7 @@ export function Navbar() {
   }
 
   return (
-    <header className="sticky top-0 z-40 flex h-16 items-center gap-4 border-b bg-background/95 px-4 backdrop-blur supports-[backdrop-filter]:bg-background/60 lg:px-6">
+    <header className="sticky top-0 z-40 flex h-16 items-center gap-4 border-b border-border/60 bg-background/80 px-4 backdrop-blur-md supports-[backdrop-filter]:bg-background/60 lg:px-8">
       <Button
         variant="ghost"
         size="icon"
@@ -77,9 +77,11 @@ export function Navbar() {
 
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button variant="ghost" className="relative h-10 gap-2 px-2">
-            <Avatar className="h-8 w-8">
-              <AvatarFallback className="text-xs">{initials}</AvatarFallback>
+          <Button variant="ghost" className="relative h-10 gap-2 rounded-lg px-2">
+            <Avatar className="h-8 w-8 ring-2 ring-primary/20 ring-offset-2 ring-offset-background">
+              <AvatarFallback className="bg-primary/10 text-xs font-semibold text-primary">
+                {initials}
+              </AvatarFallback>
             </Avatar>
             <div className="hidden text-left sm:block">
               <p className="text-sm font-medium leading-none">{user?.full_name}</p>
@@ -87,7 +89,7 @@ export function Navbar() {
             </div>
           </Button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent align="end" className="w-56">
+        <DropdownMenuContent align="end" className="w-56 rounded-xl">
           <div className="px-2 py-1.5">
             <p className="text-sm font-medium">{user?.full_name}</p>
             <p className="text-xs text-muted-foreground">{user?.email}</p>

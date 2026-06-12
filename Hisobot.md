@@ -14,6 +14,15 @@ Bu fayl loyihada bajarilgan asosiy ishlarni va qararlarni yozib borish uchun. **
 
 ---
 
+## 2026-06-12 — Admin panel UI redesign (Triad SaaS)
+
+- Triad indigo dizayn tizimi: `globals.css` tokenlar (primary 238°, semantic success/warning/info, sidebar, `--radius: 0.75rem`), `config/design.ts`.
+- App shell: guruhlangan sidebar (main/sales/finance/admin), subtle active holat, collapsed tooltip, navbar glass + avatar ring, `max-w-7xl` content.
+- Dashboard: welcome banner, rangli KPI kartalar, tezkor amallar, tenant info; `KpiCard` accent prop; receivables `KpiCard` ga o'tkazildi.
+- Shared UI: `PageHeader`, `DataTable`, yangi `EmptyState`; CRUD detail/form vizual yaxshilash.
+- Login split layout (indigo brand panel + forma); Settings section kartalar.
+- i18n: nav guruhlari, dashboard quick actions, auth brand matnlari (uz/en/ru). `npm run build` muvaffaqiyatli.
+
 ## 2026-06-12 — Qarzdorlik sahifasi crash tuzatildi
 
 - Sabab: frontend `buckets` kutgan, backend `summary` (GlobalAgingResponse) qaytaradi — `data.buckets.map` client-side exception.

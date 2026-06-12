@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { ChevronRight } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 interface Breadcrumb {
   label: string;
@@ -11,6 +12,7 @@ interface PageHeaderProps {
   description?: string;
   breadcrumbs?: Breadcrumb[];
   action?: React.ReactNode;
+  className?: string;
 }
 
 export function PageHeader({
@@ -18,9 +20,15 @@ export function PageHeader({
   description,
   breadcrumbs,
   action,
+  className,
 }: PageHeaderProps) {
   return (
-    <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+    <div
+      className={cn(
+        "flex flex-col gap-4 border-b border-border/60 pb-6 sm:flex-row sm:items-start sm:justify-between",
+        className,
+      )}
+    >
       <div className="space-y-1">
         {breadcrumbs && breadcrumbs.length > 0 && (
           <nav className="flex items-center gap-1 text-sm text-muted-foreground">
@@ -38,7 +46,7 @@ export function PageHeader({
             ))}
           </nav>
         )}
-        <h1 className="text-2xl font-bold tracking-tight">{title}</h1>
+        <h1 className="text-2xl font-bold tracking-tight md:text-3xl">{title}</h1>
         {description && (
           <p className="text-sm text-muted-foreground">{description}</p>
         )}
