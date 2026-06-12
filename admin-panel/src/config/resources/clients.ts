@@ -1,6 +1,6 @@
 import type { ResourceConfig } from "./types";
 import { clientColumns } from "@/features/clients/columns";
-import { clientCreateSchema, clientFields, clientUpdateSchema } from "@/features/clients/schemas";
+import { clientCreateSchema, clientUpdateSchema } from "@/features/clients/schemas";
 import * as clientsApi from "@/lib/api/modules/clients";
 import type { Client } from "@/types/api";
 
@@ -17,8 +17,6 @@ export const clientsResource: ResourceConfig<Client> = {
   columns: clientColumns,
   createSchema: clientCreateSchema,
   updateSchema: clientUpdateSchema,
-  createFields: clientFields,
-  updateFields: clientFields,
   searchKey: "search",
   supportsCreate: true,
   supportsEdit: true,

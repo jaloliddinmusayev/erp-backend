@@ -6,13 +6,36 @@ import type { Client } from "@/types/api";
 import { StatusBadge } from "@/components/shared/status-badge";
 import { Button } from "@/components/ui/button";
 import { Eye, Pencil } from "lucide-react";
-import { T } from "@/lib/i18n";
+import { T, useT } from "@/lib/i18n";
+
+function ClientTypeCell({ type }: { type: Client["client_type"] }) {
+  const t = useT();
+  return <span>{t(`clientType.${type}`)}</span>;
+}
 
 export const clientColumns: ColumnDef<Client, unknown>[] = [
   { accessorKey: "code", header: () => <T k="fields.code" /> },
   { accessorKey: "name", header: () => <T k="fields.name" /> },
-  { accessorKey: "phone", header: () => <T k="fields.phone" />, cell: ({ row }) => row.original.phone ?? "—" },
-  { accessorKey: "email", header: () => <T k="fields.email" />, cell: ({ row }) => row.original.email ?? "—" },
+  {
+    accessorKey: "inn",
+    header: () => <T k="fields.inn" />,
+    cell: ({ row }) => row.original.inn ?? "—",
+  },
+  {
+    accessorKey: "client_type",
+    header: () => <T k="fields.clientType" />,
+    cell: ({ row }) => <ClientTypeCell type={row.original.client_type} />,
+  },
+  {
+    accessorKey: "phone",
+    header: () => <T k="fields.phone" />,
+    cell: ({ row }) => row.original.phone ?? "—",
+  },
+  {
+    accessorKey: "city",
+    header: () => <T k="fields.city" />,
+    cell: ({ row }) => row.original.city ?? "—",
+  },
   {
     accessorKey: "is_active",
     header: () => <T k="fields.status" />,

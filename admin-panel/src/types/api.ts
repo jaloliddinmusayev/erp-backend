@@ -97,15 +97,28 @@ export interface Product {
   base_unit: RefUnit;
 }
 
+export type ClientType = "legal_entity" | "individual";
+
 export interface Client {
   id: number;
   company_id: number;
   code: string;
   name: string;
+  client_type: ClientType;
+  inn: string | null;
+  legal_name: string | null;
   contact_person: string | null;
   phone: string | null;
   email: string | null;
+  region: string | null;
+  city: string | null;
+  district: string | null;
   address: string | null;
+  latitude: number | string | null;
+  longitude: number | string | null;
+  bank_name: string | null;
+  bank_account: string | null;
+  bank_mfo: string | null;
   notes: string | null;
   is_active: boolean;
   created_at: string;

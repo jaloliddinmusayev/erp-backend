@@ -14,6 +14,11 @@ Bu fayl loyihada bajarilgan asosiy ishlarni va qararlarni yozib borish uchun. **
 
 ---
 
+## 2026-06-12 — Mijoz moduli kengaytirildi (Standart B2B)
+
+- Backend: `ClientType`, INN/STIR/PINFL, yuridik nom, viloyat/shahar/tuman, geolokatsiya (lat/lng), bank rekvizitlari; migratsiya `0009`; Pydantic validatsiya va kengaytirilgan qidiruv.
+- Admin panel: bo'limli `ClientForm`, Leaflet xarita (picker + detail), yangi ustunlar, deactivate tugmasi; i18n uz/en/ru.
+
 ## 2026-06-12 — Header dropdown layout shift tuzatildi
 
 - Globus va Super Admin dropdown ochilganda dashboard yonga siljish: Radix `modal` body scroll lock + scrollbar yo'qolishi.
