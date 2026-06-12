@@ -14,6 +14,11 @@ Bu fayl loyihada bajarilgan asosiy ishlarni va qararlarni yozib borish uchun. **
 
 ---
 
+## 2026-06-12 — Production server hujjati (vm57620)
+
+- `SERVER.md`: `/var/www/erp-backend`, `erp-backend.service`, nginx → uvicorn:8000, deploy/tekshiruv buyruqlari.
+- CORS fix (`a844e1e`) serverda deploy qilindi; OPTIONS preflight OK (`api.triad.uz` + Vercel origin).
+
 ## 2026-06-10 — Production CORS (Vercel + api.triad.uz)
 
 - `app/main.py` + `app/core/config.py`: CORS endi `CORS_ORIGINS` va `CORS_ALLOW_ORIGIN_REGEX` orqali sozlanadi.
@@ -189,5 +194,6 @@ Bu fayl loyihada bajarilgan asosiy ishlarni va qararlarni yozib borish uchun. **
 | 2026-06-10 | `LOYIHA_BATAFSIL_HISOBOT.md` — batafsil loyiha hisoboti hujjati |
 | 2026-06-10 | `admin-panel/` — Next.js ERP Admin Panel + backend CORS |
 | 2026-06-10 | `ISHLAR_HISOBOTI.md` — bajarilgan ishlar hisoboti (MD) |
+| 2026-06-12 | Production CORS deploy + `SERVER.md` (vm57620 deploy ma'lumotlari) |
 
 *Yangi qatorlarni yuqoriga yoki shu jadvalga qo‘shing.*

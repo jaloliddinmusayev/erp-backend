@@ -8,7 +8,6 @@ import { registerAuthHandlers } from "@/lib/api/client";
 import { useAuthStore } from "@/stores/auth-store";
 
 function AuthBridge() {
-  const token = useAuthStore((s) => s.token);
   const logout = useAuthStore((s) => s.logout);
 
   useEffect(() => {
@@ -16,24 +15,12 @@ function AuthBridge() {
       getToken: () => useAuthStore.getState().token,
       onUnauthorized: () => {
         logout();
-        if (typeof window !== "undefined") {
+        if (typeof window !== "undefined" && !window.location.pathname.startsWith("/login")) {
           window.location.href = "/login";
         }
       },
     });
   }, [logout]);
-
-  useEffect(() => {
-    registerAuthHandlers({
-      getToken: () => token,
-      onUnauthorized: () => {
-        logout();
-        if (typeof window !== "undefined") {
-          window.location.href = "/login";
-        }
-      },
-    });
-  }, [token, logout]);
 
   return null;
 }

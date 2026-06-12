@@ -56,6 +56,7 @@ export default function LoginPage() {
           <form
             onSubmit={handleSubmit((data) => login(data))}
             className="space-y-4"
+            noValidate
           >
             <div className="space-y-2">
               <Label htmlFor="email">Email</Label>

@@ -33,7 +33,12 @@ apiClient.interceptors.request.use(attachAuth);
 apiClient.interceptors.response.use(
   (response) => response,
   (error) => {
-    if (error.response?.status === 401) {
+    const status = error.response?.status;
+    const requestUrl = String(error.config?.url ?? "");
+    const isAuthLogin = requestUrl.includes("/auth/login");
+
+    // Wrong credentials on login must not trigger global session logout + reload.
+    if (status === 401 && !isAuthLogin) {
       onUnauthorized?.();
     }
     return Promise.reject(error);
