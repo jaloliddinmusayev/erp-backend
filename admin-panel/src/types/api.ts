@@ -255,17 +255,32 @@ export interface Role {
   updated_at: string;
 }
 
-export interface AgingBucket {
-  bucket: string;
-  label: string;
-  invoice_count: number;
-  total_outstanding: string;
+export interface AgingBucketSummary {
+  total_outstanding: string | number;
+  current: string | number;
+  days_1_30: string | number;
+  days_31_60: string | number;
+  days_61_90: string | number;
+  days_90_plus: string | number;
 }
 
+/** Matches backend `GlobalAgingResponse`. */
 export interface AgingResponse {
   as_of_date: string;
-  buckets: AgingBucket[];
-  total_outstanding: string;
+  summary: AgingBucketSummary;
+}
+
+export interface AgingInvoiceDetail {
+  invoice_id: number;
+  invoice_number: string;
+  invoice_date: string;
+  due_date: string | null;
+  total_amount: string;
+  paid_amount: string;
+  outstanding_amount: string;
+  overdue_days: number;
+  aging_bucket: string;
+  is_overdue: boolean;
 }
 
 export interface DashboardStats {

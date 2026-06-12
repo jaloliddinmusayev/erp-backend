@@ -1,9 +1,19 @@
 import { apiClient } from "../client";
-import type { AgingResponse } from "@/types/api";
+import type { AgingInvoiceDetail, AgingResponse } from "@/types/api";
 
 export async function getAging(asOfDate?: string) {
   const { data } = await apiClient.get<AgingResponse>("/receivables/aging", {
     params: asOfDate ? { as_of_date: asOfDate } : undefined,
+  });
+  return data;
+}
+
+export async function getAgingInvoices(asOfDate?: string, clientId?: number) {
+  const { data } = await apiClient.get<AgingInvoiceDetail[]>("/receivables/aging/invoices", {
+    params: {
+      ...(asOfDate ? { as_of_date: asOfDate } : {}),
+      ...(clientId ? { client_id: clientId } : {}),
+    },
   });
   return data;
 }

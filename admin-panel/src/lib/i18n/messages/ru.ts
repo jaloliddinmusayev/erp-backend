@@ -153,6 +153,12 @@ export const ru: Messages = {
     description: "Старение дебиторской задолженности — по открытым счетам",
     totalOutstanding: "Общий долг — {date}",
     invoiceCount: "{count} счетов",
+    noOutstanding: "Нет открытой дебиторской задолженности",
+    bucketCurrent: "Текущая (без просрочки)",
+    bucket1_30: "1–30 дней",
+    bucket31_60: "31–60 дней",
+    bucket61_90: "61–90 дней",
+    bucket90Plus: "90+ дней",
   },
   salesOrder: {
     mainInfo: "Основное",

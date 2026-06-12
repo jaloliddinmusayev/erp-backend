@@ -151,6 +151,12 @@ export const uz = {
     description: "Qarzdorlik yoshi (aging) — ochiq fakturalar bo'yicha",
     totalOutstanding: "Umumiy qarz — {date}",
     invoiceCount: "{count} ta faktura",
+    noOutstanding: "Ochiq qarzdorlik yo'q",
+    bucketCurrent: "Joriy (muddat o'tmagan)",
+    bucket1_30: "1–30 kun",
+    bucket31_60: "31–60 kun",
+    bucket61_90: "61–90 kun",
+    bucket90Plus: "90+ kun",
   },
   salesOrder: {
     mainInfo: "Asosiy",

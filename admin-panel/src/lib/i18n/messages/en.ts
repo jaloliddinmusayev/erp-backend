@@ -153,6 +153,12 @@ export const en: Messages = {
     description: "Receivables aging — by open invoices",
     totalOutstanding: "Total outstanding — {date}",
     invoiceCount: "{count} invoices",
+    noOutstanding: "No outstanding receivables",
+    bucketCurrent: "Current (not overdue)",
+    bucket1_30: "1–30 days",
+    bucket31_60: "31–60 days",
+    bucket61_90: "61–90 days",
+    bucket90Plus: "90+ days",
   },
   salesOrder: {
     mainInfo: "Main",

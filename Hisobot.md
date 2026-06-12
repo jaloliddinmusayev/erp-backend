@@ -14,6 +14,16 @@ Bu fayl loyihada bajarilgan asosiy ishlarni va qararlarni yozib borish uchun. **
 
 ---
 
+## 2026-06-12 — Qarzdorlik sahifasi crash tuzatildi
+
+- Sabab: frontend `buckets` kutgan, backend `summary` (GlobalAgingResponse) qaytaradi — `data.buckets.map` client-side exception.
+- `receivables/page.tsx` API formatiga moslashtirildi; aging bucket kartalari va faktura soni `/receivables/aging/invoices` dan hisoblanadi.
+
+## 2026-06-12 — Technology stack audit (TECH_STACK_AUDIT.md)
+
+- Repozitoriya bo'yicha to'liq texnologiya audit: backend (FastAPI), frontend (Next.js), DB, worker, WMS, infra, deploy.
+- Mobil ilova repoda yo'q; CI/CD, Docker, monitoring bo'shliqlari va 100/1k/10k user scale tavsiyalari hujjatlashtirildi.
+
 ## 2026-06-12 — Admin panel 3 tilli interfeys (UZ / EN / RU)
 
 - `admin-panel/src/lib/i18n/` — yengil custom i18n: `messages/{uz,en,ru}.ts` lug'atlar, `locale-store.ts` (Zustand persist, default `uz`), `translate.ts` (`tGlobal`, `MessageKey` tip), `useT()` hook va `T` komponent.
