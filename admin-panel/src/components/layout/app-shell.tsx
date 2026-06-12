@@ -24,7 +24,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
         <div className="flex min-w-0 flex-1 flex-col">
           <Navbar />
-          <main className="mx-auto w-full max-w-7xl flex-1 overflow-auto p-4 lg:p-8">
+          <main className="mx-auto w-full max-w-7xl flex-1 overflow-y-auto p-4 lg:p-8 [scrollbar-gutter:stable]">
             {children}
           </main>
         </div>

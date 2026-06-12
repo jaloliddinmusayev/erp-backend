@@ -14,6 +14,11 @@ Bu fayl loyihada bajarilgan asosiy ishlarni va qararlarni yozib borish uchun. **
 
 ---
 
+## 2026-06-12 — Header dropdown layout shift tuzatildi
+
+- Globus va Super Admin dropdown ochilganda dashboard yonga siljish: Radix `modal` body scroll lock + scrollbar yo'qolishi.
+- Yechim: `DropdownMenu` default `modal={false}`, `html { scrollbar-gutter: stable }`, main scroll container `scrollbar-gutter: stable`.
+
 ## 2026-06-12 — Admin panel UI redesign (Triad SaaS)
 
 - Triad indigo dizayn tizimi: `globals.css` tokenlar (primary 238°, semantic success/warning/info, sidebar, `--radius: 0.75rem`), `config/design.ts`.
